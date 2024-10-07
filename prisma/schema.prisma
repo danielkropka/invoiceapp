@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mongodb"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum Status {
+  PAID
+  PENDING
+  UN_PAID
+}
+
+enum Method {
+  CARD
+  CASH
+  BANK_TRANSFER
+}
+
+type Address {
+  street     String
+  postalCode String
+  city       String
+}
+
+type Product {
+  name        String
+  description String?
+  price       Int
+  quantity    Int
+  vat         Int
+}
+
+model Account {
+  id                String  @id @default(cuid()) @map("_id")
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid()) @map("_id")
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid()) @map("_id")
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  phoneNumber   String?
+  address       Address?
+
+  image    String?
+  accounts Account[]
+  sessions Session[]
+  Invoice  Invoice[]
+  Client   Client[]
+}
+
+model Client {
+  id        String   @id @default(cuid()) @map("_id")
+  createdAt DateTime @default(now())
+
+  name        String
+  email       String
+  phoneNumber String?
+  address     Address
+  taxIdNumber String?
+
+  Invoice Invoice[]
+
+  creator   User   @relation(fields: [creatorId], references: [id])
+  creatorId String
+}
+
+model Invoice {
+  id            String @id @default(cuid()) @map("_id")
+  invoiceId     String
+  status        Status
+  paymentMethod Method
+
+  issuedAt  DateTime  @default(now())
+  soldAt    DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  creator   User   @relation(fields: [creatorId], references: [id])
+  creatorId String
+  client    Client @relation(fields: [clientId], references: [id])
+  clientId  String
+}
