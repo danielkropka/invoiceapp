@@ -1,9 +1,11 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import InvoicesTable from "@/app/(dashboard)/invoices-table";
 import { getInvoices } from "@/lib/db";
 import Analytics from "@/app/(dashboard)/analytics";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default async function InvoicesPage({
   searchParams,
@@ -14,18 +16,18 @@ export default async function InvoicesPage({
   const offset = searchParams.offset ?? 0;
   const { invoices, newOffset, totalInvoices } = await getInvoices(
     search,
-    Number(offset),
+    Number(offset)
   );
 
   return (
     <>
       <div className="flex items-center ml-auto">
-        <Button className="gap-1">
+        <Link className={cn("gap-1", buttonVariants())} href="/create">
           <PlusCircle className="w-4 h-4" />
           <span className="sr-only md:not-sr-only sm:whitespace-nowrap">
             Stwórz fakturę
           </span>
-        </Button>
+        </Link>
       </div>
       <InvoicesTable
         invoices={invoices}
