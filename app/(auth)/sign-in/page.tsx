@@ -8,7 +8,7 @@ import { signIn } from "next-auth/react";
 export default function Page() {
   const loginWithGoogle = async () => {
     try {
-      await signIn("google");
+      await signIn("google", { callbackUrl: "/" });
     } catch (error) {
       console.log(error);
     }
