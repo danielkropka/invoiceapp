@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Client, Invoice } from "@prisma/client";
 import { getAnalyticData } from "@/lib/db";
 import Analytic from "@/app/(dashboard)/analytic";
 import { getAnalytics } from "@/lib/utils";
