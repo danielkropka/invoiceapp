@@ -44,7 +44,7 @@ function Analytic({
                 "text-green-600": data.isHigher,
               })}
             >
-              {Math.abs(data.percent)}%
+              {Math.abs(data.percent).toFixed(0)}%
             </span>
           </div>
         </span>

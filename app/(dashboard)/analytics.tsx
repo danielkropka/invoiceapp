@@ -7,21 +7,6 @@ import { getAnalytics } from "@/lib/utils";
 async function Analytics() {
   const { invoices, clients } = await getAnalyticData();
 
-  const analytics = [
-    {
-      label: "Nowe faktury",
-      value: "invoices",
-    },
-    {
-      label: "Nowi klienci",
-      value: "clients",
-    },
-    {
-      label: "Średnia wartość faktur",
-      value: "invoicesValue",
-    },
-  ];
-
   return (
     <Card>
       <CardHeader>
@@ -29,7 +14,20 @@ async function Analytics() {
       </CardHeader>
       <CardContent>
         <div className="grid border rounded-lg grid-cols-1 md:grid-cols-3">
-          {analytics.map((analytic) => (
+          {[
+            {
+              label: "Nowe faktury",
+              value: "invoices",
+            },
+            {
+              label: "Nowi klienci",
+              value: "clients",
+            },
+            {
+              label: "Średnia wartość faktur",
+              value: "invoicesValue",
+            },
+          ].map((analytic) => (
             <Analytic
               className={
                 "border-b last:border-b-0 md:border-b-0 md:border-r last:md:border-r-0"
