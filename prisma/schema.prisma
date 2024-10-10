@@ -11,7 +11,7 @@ datasource db {
 enum Status {
   PAID
   PENDING
-  UN_PAID
+  UNPAID
 }
 
 enum Method {
@@ -29,7 +29,7 @@ type Address {
 type Product {
   name        String
   description String?
-  price       Int
+  price       Float
   quantity    Int
   vat         Int
 }
