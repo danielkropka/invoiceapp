@@ -51,28 +51,32 @@ function ClientsTable({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="hidden md:table-cell">E-mail</TableHead>
-              <TableHead>Nazwa</TableHead>
-              <TableHead className="hidden md:table-cell">
-                Data utworzenia
-              </TableHead>
-              <TableHead>
-                <span className="sr-only">Akcje</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {clients.map((client) => (
-              <Client key={client.id} client={client} />
-            ))}
-          </TableBody>
-        </Table>
+        {clients.length === 0 ? (
+          <div className="text-center">Brak klientów.</div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="hidden md:table-cell">E-mail</TableHead>
+                <TableHead>Nazwa</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Data utworzenia
+                </TableHead>
+                <TableHead>
+                  <span className="sr-only">Akcje</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {clients.map((client) => (
+                <Client key={client.id} client={client} />
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
       <CardFooter>
-        {offset && (
+        {offset && offset !== 0 ? (
           <form>
             <div className="flex">
               <Button
@@ -97,7 +101,7 @@ function ClientsTable({
               </Button>
             </div>
           </form>
-        )}
+        ) : null}
       </CardFooter>
     </Card>
   );

@@ -52,57 +52,59 @@ function InvoicesTable({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Numer</TableHead>
-              <TableHead className="hidden md:table-cell">E-mail</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">
-                Wartość brutto
-              </TableHead>
-              <TableHead className="hidden md:table-cell">
-                Data wystawienia
-              </TableHead>
-              <TableHead>
-                <span className="sr-only">Akcje</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoices.map((invoice) => (
-              <Invoice key={invoice.id} invoice={invoice} />
-            ))}
-          </TableBody>
-        </Table>
+        {invoices.length === 0 ? (
+          <div className="text-center">Brak faktur.</div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Numer</TableHead>
+                <TableHead className="hidden md:table-cell">E-mail</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Wartość brutto
+                </TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Data wystawienia
+                </TableHead>
+                <TableHead>
+                  <span className="sr-only">Akcje</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {invoices.map((invoice) => (
+                <Invoice key={invoice.id} invoice={invoice} />
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
       <CardFooter>
-        {offset && (
-          <form>
-            <div className="flex">
-              <Button
-                formAction={prevPage}
-                variant="ghost"
-                size="sm"
-                type="submit"
-                disabled={offset === invoicesPerPage}
-              >
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Poprzednia
-              </Button>
-              <Button
-                formAction={nextPage}
-                variant="ghost"
-                size="sm"
-                type="submit"
-                disabled={offset >= totalInvoices}
-              >
-                Następna
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </form>
-        )}
+        {offset && offset !== 0 ? (
+          <div className="flex">
+            <Button
+              onClick={prevPage}
+              variant="ghost"
+              size="sm"
+              type="submit"
+              disabled={offset === invoicesPerPage}
+            >
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Poprzednia
+            </Button>
+            <Button
+              onClick={nextPage}
+              variant="ghost"
+              size="sm"
+              type="submit"
+              disabled={offset >= totalInvoices}
+            >
+              Następna
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        ) : null}
       </CardFooter>
     </Card>
   );
