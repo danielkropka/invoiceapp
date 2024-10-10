@@ -13,7 +13,7 @@ function Analytic({
   data: {
     value: string;
     percent: number;
-    isHigher?: boolean;
+    isHigher: boolean;
   };
 }) {
   return (
@@ -29,7 +29,7 @@ function Analytic({
                 {
                   "bg-green-200": data.isHigher,
                   "bg-red-200": !data.isHigher,
-                },
+                }
               )}
             >
               {data.isHigher ? (
