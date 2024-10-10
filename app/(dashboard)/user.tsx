@@ -1,11 +1,13 @@
 import React from "react";
 import { getAuthSession } from "@/lib/auth";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import UserMenu from "@/app/(dashboard)/user-menu";
 
 const User = async () => {
   const session = await getAuthSession();
-  if (!session?.user) return notFound();
+  if (!session?.user) {
+    redirect("/sign-in");
+  }
   const user = session.user;
 
   return <UserMenu user={user} />;
