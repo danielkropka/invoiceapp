@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const { invoiceId, issuedAt, soldAt, paymentMethod, status, products } =
       invoiceFormSchema.parse(body);
 
-    /* const invoiceExist = await db.invoice.findFirst({
+    const invoiceExist = await db.invoice.findFirst({
       where: {
         invoiceId,
       },
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         creatorId: session.user.id,
       },
     });
- */
+
     return new Response("Invoice created", { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
