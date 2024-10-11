@@ -31,7 +31,7 @@ type Product {
   description String?
   price       Float
   quantity    Int
-  vat         Int
+  vat         String
 }
 
 model Account {
@@ -94,7 +94,7 @@ model Client {
 
 model Invoice {
   id            String @id @default(cuid()) @map("_id")
-  invoiceId     String
+  invoiceId     String @unique
   status        Status
   paymentMethod Method
 
