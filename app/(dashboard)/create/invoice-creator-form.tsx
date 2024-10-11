@@ -26,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import moment from "moment";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PlusCircle, Trash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -43,7 +43,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-type invoiceType = z.infer<typeof invoiceFormSchema>;
+type invoiceType = z.infer<typeof invoiceFormSchema> & { clientId: string };
 
 function InvoiceCreatorForm() {
   const form = useForm<invoiceType>({
@@ -61,6 +61,7 @@ function InvoiceCreatorForm() {
       issuedAt,
       soldAt,
       products,
+      clientId,
     }: invoiceType) => {
       return await axios.post("/api/create/invoice", {
         invoiceId,
@@ -69,11 +70,16 @@ function InvoiceCreatorForm() {
         issuedAt,
         soldAt,
         products,
+        clientId,
       });
     },
   });
 
-  const { fields: products } = useFieldArray({
+  const {
+    fields: products,
+    append,
+    remove,
+  } = useFieldArray({
     control: form.control,
     name: "products",
   });
@@ -118,7 +124,7 @@ function InvoiceCreatorForm() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-full " + "pl-3 text-left font-normal",
+                              "w-full pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -157,7 +163,7 @@ function InvoiceCreatorForm() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-full " + "pl-3 text-left font-normal",
+                              "w-full pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -200,9 +206,11 @@ function InvoiceCreatorForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="PAID">Zapłacone</SelectItem>
-                        <SelectItem value="PENDING">Oczekuje</SelectItem>
-                        <SelectItem value="UNPAID">Niezapłacone</SelectItem>
+                        <SelectItem value="CARD">Karta bankowa</SelectItem>
+                        <SelectItem value="CASH">Gotówka</SelectItem>
+                        <SelectItem value="BANK_TRANSFER">
+                          Przelew bankowy
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -225,11 +233,9 @@ function InvoiceCreatorForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="CARD">Karta bankowa</SelectItem>
-                        <SelectItem value="CASH">Gotówka</SelectItem>
-                        <SelectItem value="BANK_TRANSFER">
-                          Przelew bankowy
-                        </SelectItem>
+                        <SelectItem value="PAID">Zapłacone</SelectItem>
+                        <SelectItem value="PENDING">Oczekuje</SelectItem>
+                        <SelectItem value="UNPAID">Niezapłacone</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -238,104 +244,149 @@ function InvoiceCreatorForm() {
               />
             </div>
             <span className="text-2xl font-semibold">Produkty</span>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">L.P.</TableHead>
-                  <TableHead>Nazwa</TableHead>
-                  <TableHead>Opis</TableHead>
-                  <TableHead>Cena netto</TableHead>
-                  <TableHead>Wartość netto</TableHead>
-                  <TableHead>Stawka VAT</TableHead>
-                  <TableHead>Kwota VAT</TableHead>
-                  <TableHead>Wartość brutto</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((product, index) => (
-                  <TableRow key={product.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`products.${index}.name`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`products.${index}.description`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`products.${index}.price`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input type="number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input name="netWorth" type="number" disabled />
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`products.${index}.vat`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Wybierz VAT" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="23">23%</SelectItem>
-                                <SelectItem value="5">5%</SelectItem>
-                                <SelectItem value="3">3%</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input name="vatWorth" type="number" disabled />
-                    </TableCell>
-                    <TableCell>
-                      <Input name="grossWorth" type="number" disabled />
-                    </TableCell>
+            <div>
+              <Button
+                type="button"
+                className="gap-1"
+                size={"sm"}
+                onClick={() =>
+                  append({ name: "", price: 0, quantity: 0, vat: "23" })
+                }
+                disabled={products.length > 9}
+              >
+                <PlusCircle className="w-4 h-4" /> Dodaj produkt
+              </Button>
+            </div>
+            <div className="max-w-[308px] sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-6xl 2xl:max-w-full">
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]">L.P.</TableHead>
+                    <TableHead>Nazwa</TableHead>
+                    <TableHead>Opis</TableHead>
+                    <TableHead>Cena netto</TableHead>
+                    <TableHead>Wartość netto</TableHead>
+                    <TableHead>Stawka VAT</TableHead>
+                    <TableHead>Kwota VAT</TableHead>
+                    <TableHead>Wartość brutto</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {products.map((product, index) => (
+                    <TableRow key={product.id}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>
+                        <FormField
+                          control={form.control}
+                          name={`products.${index}.name`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input className="w-[150px]" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <FormField
+                          control={form.control}
+                          name={`products.${index}.description`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input className="w-[150px]" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <FormField
+                          control={form.control}
+                          name={`products.${index}.price`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  className="w-[150px]"
+                                  type="number"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          name="netWorth"
+                          className="w-[150px]"
+                          type="number"
+                          disabled
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <FormField
+                          control={form.control}
+                          name={`products.${index}.vat`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="w-[150px]">
+                                    <SelectValue placeholder="Wybierz VAT" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="23">23%</SelectItem>
+                                  <SelectItem value="5">5%</SelectItem>
+                                  <SelectItem value="3">3%</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          name="vatWorth"
+                          className="w-[150px]"
+                          type="number"
+                          disabled
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          name="grossWorth"
+                          className="w-[150px]"
+                          type="number"
+                          disabled
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          type="button"
+                          variant={"destructive"}
+                          size={"icon"}
+                          onClick={() => remove(index)}
+                          disabled={products.length === 1}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </form>
         </Form>
       </CardContent>
