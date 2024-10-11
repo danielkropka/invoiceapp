@@ -12,13 +12,13 @@ export async function POST(req: Request) {
     const { name, phoneNumber, taxIdNumber, address, email } =
       clientFormSchema.parse(body);
 
-    const isClientExist = await db.client.findFirst({
+    const clientExist = await db.client.findFirst({
       where: {
         email,
       },
     });
 
-    if (isClientExist)
+    if (clientExist)
       return new Response("Client already exists", { status: 400 });
 
     await db.client.create({
