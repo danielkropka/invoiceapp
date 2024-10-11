@@ -13,16 +13,9 @@ import { ExtendedInvoice } from "@/types/db";
 import moment from "moment";
 import "moment/locale/pl";
 import { Badge } from "@/components/ui/badge";
+import { sumAllProducts } from "@/lib/utils";
 
 function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
-  const countProductsSumBrutto = () => {
-    let sum = 0;
-    invoice.products.forEach((product) => {
-      sum += product.price * product.quantity * (1 + product.vat / 100);
-    });
-    return sum;
-  };
-
   return (
     <TableRow>
       <TableCell className="font-medium">{invoice.invoiceId}</TableCell>
@@ -34,12 +27,12 @@ function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
           {invoice.status === "PAID"
             ? "zapłacono"
             : invoice.status === "PENDING"
-              ? "oczekuje"
-              : "niezapłacono"}
+            ? "oczekuje"
+            : "niezapłacono"}
         </Badge>
       </TableCell>
       <TableCell className="hidden md:table-cell">
-        {countProductsSumBrutto().toFixed(2)} PLN
+        {sumAllProducts(invoice.products).toFixed(2)} PLN
       </TableCell>
       <TableCell className="hidden md:table-cell">
         {moment(invoice.issuedAt).format("L")}
