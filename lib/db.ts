@@ -7,7 +7,7 @@ import { Client, Invoice } from "@prisma/client";
 
 export async function getInvoices(
   search: string,
-  offset: number,
+  offset: number
 ): Promise<{
   invoices: ExtendedInvoice[];
   newOffset: number | null;
@@ -41,7 +41,7 @@ export async function getInvoices(
     return { invoices: [], newOffset: null, totalInvoices: 0 };
   }
 
-  const totalInvoices = await db.invoice.findMany({
+  const totalInvoices = await db.invoice.count({
     where: {
       creatorId: user.id,
     },
@@ -61,13 +61,32 @@ export async function getInvoices(
   return {
     invoices: moreInvoices,
     newOffset,
-    totalInvoices: totalInvoices.length,
+    totalInvoices: totalInvoices,
   };
 }
 
+export async function getPreferredInvoiceId(): Promise<{ id: number | null }> {
+  const session = await getAuthSession();
+  if (!session?.user) return { id: null };
+  const currentDate = new Date();
+  const invoicesInThisMonth = await db.invoice.count({
+    where: {
+      creatorId: session.user.id,
+      createdAt: {
+        gt: new Date(
+          `${currentDate.getFullYear}-${currentDate.getMonth() + 1}-1`
+        ),
+      },
+    },
+  });
+
+  return { id: invoicesInThisMonth + 1 };
+}
+
 export async function getClients(
-  search: string,
-  offset: number,
+  search: string | null,
+  offset: number | null,
+  getAll: boolean = false
 ): Promise<{
   clients: Client[];
   newOffset: number | null;
@@ -76,44 +95,63 @@ export async function getClients(
   const session = await getAuthSession();
   if (!session?.user) return { clients: [], newOffset: null, totalClients: 0 };
   const user = session.user;
-  if (search) {
+
+  if (getAll) {
+    const clients = await db.client.findMany({
+      where: {
+        creatorId: user.id,
+      },
+    });
+
     return {
-      clients: await db.client.findMany({
-        where: {
-          creatorId: user.id,
-          email: {
-            contains: search,
-          },
-        },
-      }),
+      clients,
       newOffset: null,
-      totalClients: 0,
+      totalClients: clients.length,
     };
   }
 
-  if (offset === null) {
-    return { clients: [], newOffset: null, totalClients: 0 };
+  if (search) {
+    const clients = await db.client.findMany({
+      where: {
+        creatorId: user.id,
+        email: {
+          contains: search,
+        },
+      },
+    });
+
+    return {
+      clients,
+      newOffset: null,
+      totalClients: clients.length,
+    };
   }
 
-  const totalClients = await db.client.findMany({
-    where: {
-      creatorId: user.id,
-    },
-  });
-  const moreClients = await db.client.findMany({
-    where: {
-      creatorId: user.id,
-    },
-    skip: offset,
-    take: 5,
-  });
-  const newOffset = offset + moreClients.length;
+  if (offset !== null) {
+    const totalClients = await db.client.count({
+      where: {
+        creatorId: user.id,
+      },
+    });
 
-  return {
-    clients: moreClients,
-    newOffset,
-    totalClients: totalClients.length,
-  };
+    const moreClients = await db.client.findMany({
+      where: {
+        creatorId: user.id,
+      },
+      skip: offset,
+      take: 5,
+    });
+
+    const newOffset = offset + moreClients.length;
+
+    return {
+      clients: moreClients,
+      newOffset,
+      totalClients: totalClients,
+    };
+  }
+
+  return { clients: [], newOffset: null, totalClients: 0 };
 }
 
 export async function getAnalyticData(): Promise<{

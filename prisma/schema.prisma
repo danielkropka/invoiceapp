@@ -93,10 +93,10 @@ model Client {
 }
 
 model Invoice {
-  id            String @id @default(cuid()) @map("_id")
-  invoiceId     String @unique
-  status        Status
-  paymentMethod Method
+  id            String  @id @default(cuid()) @map("_id")
+  invoiceId     String  @unique
+  status        Status?
+  paymentMethod Method?
 
   issuedAt  DateTime  @default(now())
   soldAt    DateTime  @default(now())

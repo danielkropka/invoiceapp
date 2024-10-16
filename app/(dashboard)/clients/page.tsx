@@ -16,6 +16,7 @@ export default async function ClientsPage({
   const { clients, newOffset, totalClients } = await getClients(
     search,
     Number(offset),
+    false
   );
   return (
     <>
