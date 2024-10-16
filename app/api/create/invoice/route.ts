@@ -9,9 +9,8 @@ export async function POST(req: Request) {
     if (!session?.user) return new Response("Unauthorized", { status: 401 });
 
     const body = await req.json();
-    console.log(body);
-
-    const { invoiceId, issuedAt, soldAt, paymentMethod, status, products } =
+    const { clientId } = body;
+    const { invoiceId, issuedAt, soldAt, products } =
       invoiceFormSchema.parse(body);
 
     const invoiceExist = await db.invoice.findFirst({
@@ -30,10 +29,8 @@ export async function POST(req: Request) {
         invoiceId,
         issuedAt,
         soldAt,
-        paymentMethod,
-        status,
         products,
-        clientId: " sasas",
+        clientId,
         creatorId: session.user.id,
       },
     });

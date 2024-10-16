@@ -1,6 +1,5 @@
 import { z } from "zod";
 import validator from "validator";
-import { Method, Status } from "@prisma/client";
 
 export const clientFormSchema = z.object({
   name: z.string(),
@@ -16,8 +15,6 @@ export const clientFormSchema = z.object({
 
 export const invoiceFormSchema = z.object({
   invoiceId: z.string(),
-  status: z.nativeEnum(Status),
-  paymentMethod: z.nativeEnum(Method),
   issuedAt: z.date(),
   soldAt: z.date(),
   products: z
