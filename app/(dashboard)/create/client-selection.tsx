@@ -29,7 +29,7 @@ export default function ClientSelection({
   form,
 }: {
   clients: Client[];
-  form: UseFormReturn<invoiceType, any, undefined>;
+  form: UseFormReturn<invoiceType, "client", undefined>;
 }) {
   return (
     <FormField

@@ -4,7 +4,7 @@ import { invoiceType } from "./invoice-creator-form";
 export default function Products({
   form,
 }: {
-  form: UseFormReturn<invoiceType, any, undefined>;
+  form: UseFormReturn<invoiceType, "products", undefined>;
 }) {
   /* const {
     fields: products,
