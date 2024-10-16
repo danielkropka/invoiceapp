@@ -27,15 +27,21 @@ function Analytic({
               className={clsx(
                 "rounded-full w-5 h-5 flex items-center justify-center",
                 {
-                  "bg-green-200": data.isHigher,
-                  "bg-red-200": !data.isHigher,
+                  "bg-green-200 dark:bg-green-600": data.isHigher,
+                  "bg-red-200 dark:bg-red-600": !data.isHigher,
                 }
               )}
             >
               {data.isHigher ? (
-                <ArrowUp strokeWidth={3} className="w-4 h-4 text-green-600" />
+                <ArrowUp
+                  strokeWidth={3}
+                  className="w-4 h-4 text-green-600 dark:text-green-200"
+                />
               ) : (
-                <ArrowDown strokeWidth={3} className="w-4 h-4 text-red-600" />
+                <ArrowDown
+                  strokeWidth={3}
+                  className="w-4 h-4 text-red-600 dark:text-red-200"
+                />
               )}
             </span>
             <span
