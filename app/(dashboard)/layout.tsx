@@ -7,6 +7,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import User from "@/app/(dashboard)/user";
 import { SearchInput } from "@/app/(dashboard)/search";
+import DashboardBreadCrumb from "./breadcrumb";
+import { ModeToggle } from "./mode-toggle";
 
 export default function DashboardLayout({
   children,
@@ -14,42 +16,44 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex flex-col min-h-screen w-full bg-muted/40">
-      <DesktopNav />
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <MobileNav />
-          <SearchInput />
-          <User />
-        </header>
-        <main className="grid flex-1 items-start gap-2 p-4 sm:px-6 sm:py-0 md:gap-4 bg-muted/40">
-          {children}
-        </main>
-      </div>
-    </main>
+    <Providers>
+      <main className="flex flex-col min-h-screen w-full bg-muted/40">
+        <DesktopNav />
+        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+            <MobileNav />
+            <DashboardBreadCrumb />
+            <SearchInput />
+            <User />
+            <ModeToggle />
+          </header>
+          <main className="grid flex-1 items-start gap-2 px-4 py-2 sm:px-6 sm:py-2 md:gap-4 bg-muted/40">
+            {children}
+          </main>
+        </div>
+      </main>
+    </Providers>
   );
 }
 
 function DesktopNav() {
   return (
-    <Providers>
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
-        <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-          <NavItem href={"/"} label={"Strona główna"}>
-            <Home className="w-5 h-5" />
-          </NavItem>
+    <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
+      <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+        <NavItem href={"/"} label={"Strona główna"}>
+          <Home className="w-5 h-5" />
+        </NavItem>
 
-          <NavItem href={"/clients"} label={"Klienci"}>
-            <Users2 className="w-5 h-5" />
-          </NavItem>
-        </nav>
-        <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-          <NavItem href={"/settings"} label={"Ustawienia"}>
-            <Settings className="w-5 h-5" />
-          </NavItem>
-        </nav>
-      </aside>
-    </Providers>
+        <NavItem href={"/clients"} label={"Klienci"}>
+          <Users2 className="w-5 h-5" />
+        </NavItem>
+      </nav>
+      <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+        <NavItem href={"/settings"} label={"Ustawienia"}>
+          <Settings className="w-5 h-5" />
+        </NavItem>
+      </nav>
+    </aside>
   );
 }
 

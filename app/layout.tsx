@@ -5,6 +5,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import Provider from "@/components/Provider";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +26,14 @@ export default function RootLayout({
       <body
         className={cn(inter.className, "flex flex-col min-h-screen w-full")}
       >
-        <Provider>{children}</Provider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
+          <Provider>{children}</Provider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

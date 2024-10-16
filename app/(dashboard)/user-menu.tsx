@@ -22,7 +22,7 @@ function UserMenu({ user }: { user: User }) {
         <Button
           variant="outline"
           size="icon"
-          className="overflow-hidden rounded-full ml-auto"
+          className="overflow-hidden rounded-full"
         >
           <Image
             src={user?.image ?? "/placeholder-user.jpg"}
