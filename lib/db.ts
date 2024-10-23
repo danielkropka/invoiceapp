@@ -5,6 +5,10 @@ import { getAuthSession } from "@/lib/auth";
 import { ExtendedInvoice } from "@/types/db";
 import { Client, Invoice } from "@prisma/client";
 
+/* function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+ */
 export async function getInvoices(
   search: string,
   offset: number

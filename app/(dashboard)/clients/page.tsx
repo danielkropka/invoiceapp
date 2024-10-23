@@ -1,23 +1,23 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { PlusCircle } from "lucide-react";
-import ClientsTable from "@/app/(dashboard)/clients/clients-table";
-import { getClients } from "@/lib/db";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Loader from "@/components/loader";
+import ClientsCardContent from "./clientsCardContent";
 
-export default async function ClientsPage({
+export default async function Clients({
   searchParams,
 }: {
   searchParams: { q: string; offset: string };
 }) {
-  const search = searchParams.q ?? "";
-  const offset = searchParams.offset ?? 0;
-  const { clients, newOffset, totalClients } = await getClients(
-    search,
-    Number(offset),
-    false
-  );
   return (
     <>
       <div className="flex items-center ml-auto">
@@ -28,11 +28,23 @@ export default async function ClientsPage({
           </span>
         </Link>
       </div>
-      <ClientsTable
-        clients={clients}
-        offset={newOffset}
-        totalClients={totalClients}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Twoi klienci</CardTitle>
+          <CardDescription>
+            Zarządzaj swoimi klientami - edytuj, usuwaj i twórz nowych klientów.
+          </CardDescription>
+        </CardHeader>
+        <Suspense
+          fallback={
+            <CardContent>
+              <Loader />
+            </CardContent>
+          }
+        >
+          <ClientsCardContent searchParams={searchParams} />
+        </Suspense>
+      </Card>
     </>
   );
 }

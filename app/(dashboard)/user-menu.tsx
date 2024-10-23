@@ -14,6 +14,7 @@ import Image from "next/image";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { User } from "next-auth";
+import { toast } from "sonner";
 
 function UserMenu({ user }: { user: User }) {
   return (
@@ -28,7 +29,7 @@ function UserMenu({ user }: { user: User }) {
             src={user?.image ?? "/placeholder-user.jpg"}
             width={36}
             height={36}
-            alt="Awatar"
+            alt="avatar"
             unoptimized={false}
             className="overflow-hidden rounded-full"
           />
@@ -46,7 +47,7 @@ function UserMenu({ user }: { user: User }) {
                 signOut({
                   callbackUrl: "/sign-in",
                 }).then(() => {
-                  /* TODO: Notify user that he has logged out*/
+                  toast.success("Pomyślnie wylogowano Cię.");
                 });
               }}
             >

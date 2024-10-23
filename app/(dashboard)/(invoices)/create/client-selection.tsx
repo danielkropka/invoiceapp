@@ -3,6 +3,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Client } from "@prisma/client";
 import { UseFormReturn } from "react-hook-form";
@@ -21,8 +22,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
+import React from "react";
 
 export default function ClientSelection({
   clients,
@@ -31,14 +33,16 @@ export default function ClientSelection({
   clients: Client[];
   form: UseFormReturn<invoiceType, "client", undefined>;
 }) {
+  const [open, setOpen] = React.useState(false);
+
   return (
     <FormField
       control={form.control}
-      name="client"
+      name="clientId"
       render={({ field }) => (
         <FormItem className="flex flex-col col-span-full">
           <FormLabel>Nazwa klienta</FormLabel>
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
@@ -49,11 +53,13 @@ export default function ClientSelection({
                     !field.value && "text-muted-foreground"
                   )}
                 >
-                  {field.value
-                    ? clients.find(
-                        (client) => client.email === field.value.email
-                      )?.name
-                    : "Wybierz klienta"}
+                  <span className="flex gap-3 items-center">
+                    <UserRound className="w-5 h-5" />
+                    {field.value
+                      ? clients.find((client) => client.id === field.value)
+                          ?.name
+                      : "Wybierz klienta z listy"}
+                  </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
@@ -69,13 +75,14 @@ export default function ClientSelection({
                         value={client.email}
                         key={client.id}
                         onSelect={() => {
-                          form.setValue("client", client);
+                          form.setValue("clientId", client.id);
+                          setOpen(false);
                         }}
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            client.email === field.value?.email
+                            client.id === field.value
                               ? "opacity-100"
                               : "opacity-0"
                           )}
@@ -93,6 +100,7 @@ export default function ClientSelection({
               </Command>
             </PopoverContent>
           </Popover>
+          <FormMessage />
         </FormItem>
       )}
     />

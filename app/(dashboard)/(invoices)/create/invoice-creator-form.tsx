@@ -26,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import moment from "moment";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PlusCircle } from "lucide-react";
 import Products from "./products";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -50,7 +50,6 @@ function InvoiceCreatorForm({
     resolver: zodResolver(invoiceFormSchema),
     defaultValues: {
       products: [{}],
-      client: undefined,
       invoiceId: `${autoInvoiceId}-${
         currentDate.getMonth() + 1
       }/${currentDate.getFullYear()}`,
@@ -64,14 +63,14 @@ function InvoiceCreatorForm({
       issuedAt,
       soldAt,
       products,
-      client,
+      clientId,
     }: invoiceType) => {
       return await axios.post("/api/create/invoice", {
         invoiceId,
         issuedAt,
         soldAt,
         products,
-        clientId: client.id,
+        clientId,
       });
     },
     onError: (err) => {
@@ -101,7 +100,7 @@ function InvoiceCreatorForm({
             onSubmit={form.handleSubmit((data) => saveInvoice(data))}
             className="flex flex-col gap-5"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl">
               <span className="col-span-full text-2xl font-semibold">
                 Podstawowe dane
               </span>
@@ -128,6 +127,7 @@ function InvoiceCreatorForm({
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            type="button"
                             variant={"outline"}
                             className={cn(
                               "w-full pl-3 text-left font-normal",
@@ -175,6 +175,7 @@ function InvoiceCreatorForm({
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            type="button"
                             variant={"outline"}
                             className={cn(
                               "w-full pl-3 text-left font-normal",
@@ -210,12 +211,22 @@ function InvoiceCreatorForm({
                 )}
               />
               <span className="text-2xl font-semibold col-span-full">
-                Klient
+                Dane klienta
               </span>
               <ClientSelection clients={clients} form={form} />
+              <span className="text-2xl font-semibold col-span-full">
+                Produkty
+              </span>
+              <Products form={form}>
+                <Button
+                  type="submit"
+                  className="flex gap-1 items-center w-full md:w-fit"
+                >
+                  <PlusCircle className="w-5 h-5" />
+                  Zapisz fakturę
+                </Button>
+              </Products>
             </div>
-            <span className="text-2xl font-semibold">Produkty</span>
-            <Products form={form} />
           </form>
         </Form>
       </CardContent>

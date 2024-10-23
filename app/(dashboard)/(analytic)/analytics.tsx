@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAnalyticData } from "@/lib/db";
-import Analytic from "@/app/(dashboard)/analytic";
+import Analytic from "@/app/(dashboard)/(analytic)/analytic";
 import { getAnalytics } from "@/lib/utils";
 
 async function Analytics() {

@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
-import "moment/locale/pl";
 import { Client as ClientType } from "@prisma/client";
 import moment from "moment";
+import "moment/locale/pl";
 
 function Client({ client }: { client: ClientType }) {
   return (

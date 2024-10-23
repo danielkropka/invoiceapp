@@ -1,24 +1,24 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import InvoicesTable from "@/app/(dashboard)/invoices-table";
-import { getInvoices } from "@/lib/db";
-import Analytics from "@/app/(dashboard)/analytics";
+import Analytics from "@/app/(dashboard)/(analytic)/analytics";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import InvoicesCardContent from "./(invoices)/invoicesCardContent";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Loader from "@/components/loader";
 
-export default async function InvoicesPage({
+export default function Home({
   searchParams,
 }: {
   searchParams: { q: string; offset: string };
 }) {
-  const search = searchParams.q ?? "";
-  const offset = searchParams.offset ?? 0;
-  const { invoices, newOffset, totalInvoices } = await getInvoices(
-    search,
-    Number(offset)
-  );
-
   return (
     <>
       <div className="flex items-center ml-auto">
@@ -29,11 +29,24 @@ export default async function InvoicesPage({
           </span>
         </Link>
       </div>
-      <InvoicesTable
-        invoices={invoices}
-        offset={newOffset}
-        totalInvoices={totalInvoices}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Twoje faktury</CardTitle>
+          <CardDescription>
+            Zarządzaj swoimi wystawionymi fakturami - edytuj, usuwaj i twórz
+            nowe faktury.
+          </CardDescription>
+        </CardHeader>
+        <Suspense
+          fallback={
+            <CardContent>
+              <Loader />
+            </CardContent>
+          }
+        >
+          <InvoicesCardContent searchParams={searchParams} />
+        </Suspense>
+      </Card>
       <Analytics />
     </>
   );

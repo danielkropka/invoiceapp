@@ -15,14 +15,15 @@ export const clientFormSchema = z.object({
 
 export const invoiceFormSchema = z.object({
   invoiceId: z.string(),
-  issuedAt: z.date(),
-  soldAt: z.date(),
+  issuedAt: z.coerce.date(),
+  soldAt: z.coerce.date(),
+  clientId: z.string(),
   products: z
     .object({
       name: z.string(),
       description: z.string().optional(),
-      price: z.number(),
-      quantity: z.number(),
+      price: z.coerce.number(),
+      quantity: z.coerce.number(),
       vat: z.string(),
     })
     .array(),
