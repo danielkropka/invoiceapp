@@ -30,7 +30,7 @@ function UserMenu({ user }: { user: User }) {
             width={36}
             height={36}
             alt="avatar"
-            unoptimized={false}
+            unoptimized
             className="overflow-hidden rounded-full"
           />
         </Button>

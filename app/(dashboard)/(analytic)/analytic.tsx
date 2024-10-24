@@ -27,7 +27,7 @@ function Analytic({
               className={clsx(
                 "rounded-full w-5 h-5 flex items-center justify-center",
                 {
-                  "bg-green-200 dark:bg-green-600": data.isHigher,
+                  "bg-green-200 dark:bg-[#0C642C]": data.isHigher,
                   "bg-red-200 dark:bg-red-600": !data.isHigher,
                 }
               )}
@@ -35,7 +35,7 @@ function Analytic({
               {data.isHigher ? (
                 <ArrowUp
                   strokeWidth={3}
-                  className="w-4 h-4 text-green-600 dark:text-green-200"
+                  className="w-4 h-4 text-[#0C642C] dark:text-green-200"
                 />
               ) : (
                 <ArrowDown
@@ -47,7 +47,7 @@ function Analytic({
             <span
               className={clsx("text-base", {
                 "text-red-600": !data.isHigher,
-                "text-green-600": data.isHigher,
+                "text-[#0C642C]": data.isHigher,
               })}
             >
               {Math.abs(data.percent).toFixed(0)}%

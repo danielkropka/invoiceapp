@@ -47,15 +47,13 @@ export default function Products({
     <div className="col-span-full">
       <Table className="products-table">
         <TableCaption>Lista twoich produktów.</TableCaption>
-        <TableHeader className="bg-muted">
+        <TableHeader className="bg-muted/40">
           <TableRow>
-            <TableHead className="rounded-l w-[150px]">
-              Produkt/usługa
-            </TableHead>
-            <TableHead className="w-[150px]">Opis</TableHead>
-            <TableHead className="w-[150px]">Cena netto</TableHead>
+            <TableHead className="rounded-l">Produkt/usługa</TableHead>
+            <TableHead>Opis</TableHead>
+            <TableHead>Cena netto</TableHead>
             <TableHead>Ilość</TableHead>
-            <TableHead className="w-[150px]">VAT</TableHead>
+            <TableHead>VAT</TableHead>
             <TableHead className="w-3 rounded-r"></TableHead>
           </TableRow>
         </TableHeader>
@@ -69,7 +67,7 @@ export default function Products({
                     <FormItem>
                       <FormControl>
                         <Input
-                          className="w-[150px]"
+                          className="w-[150px] md:w-full"
                           type="text"
                           placeholder="Nazwa produktu/usługi"
                           {...field}
@@ -87,7 +85,7 @@ export default function Products({
                     <FormItem>
                       <FormControl>
                         <Input
-                          className="w-[150px]"
+                          className="w-[150px] md:w-full"
                           type="text"
                           placeholder="Opis produktu/usługi"
                           {...field}
@@ -105,7 +103,7 @@ export default function Products({
                     <FormItem>
                       <FormControl>
                         <Input
-                          className="w-[150px]"
+                          className="w-[150px] md:w-full"
                           type="number"
                           placeholder="Cena netto"
                           {...field}
@@ -123,7 +121,7 @@ export default function Products({
                     <FormItem>
                       <FormControl>
                         <Input
-                          className="w-[150px]"
+                          className="w-[150px] md:w-full"
                           type="number"
                           placeholder="Ilość"
                           {...field}
@@ -138,13 +136,13 @@ export default function Products({
                 <FormField
                   name={`products.${index}.vat`}
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="w-full">
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-[150px]">
+                          <SelectTrigger className="w-[150px] md:w-full">
                             <SelectValue placeholder="Wybierz VAT" />
                           </SelectTrigger>
                         </FormControl>
@@ -162,6 +160,7 @@ export default function Products({
               <TableCell>
                 <Button
                   type="button"
+                  className="hover:text-red-500"
                   variant={"ghost"}
                   onClick={(e) => {
                     e.preventDefault();
@@ -169,7 +168,7 @@ export default function Products({
                   }}
                   disabled={products.length === 1}
                 >
-                  <Trash2 className="w-5 h-5 text-muted-foreground hover:text-black transition-colors" />
+                  <Trash2 className="w-5 h-5" />
                 </Button>
               </TableCell>
             </TableRow>
