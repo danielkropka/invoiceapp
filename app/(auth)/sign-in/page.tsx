@@ -35,7 +35,7 @@ export default function Page() {
           </Button>
         </div>
       </div>
-      <div className="w-full h-full bg-gradient-to-br from-slate-200 dark:from-slate-900 border-l overflow-hidden relative rounded-l-[5rem]">
+      <div className="w-full max-w-6xl h-full bg-gradient-to-br from-slate-200 dark:from-slate-900 border-l overflow-hidden relative rounded-l-[5rem] hidden lg:block">
         <h1 className="absolute top-12 left-12 font-semibold text-3xl">
           Twórz faktury szybko i bez stresu
         </h1>
@@ -44,12 +44,13 @@ export default function Page() {
         </h3>
         <div className="-rotate-[14deg]">
           <Image
-            className="top-[21rem] left-44 absolute scale-[1.4] rounded dark:border"
+            className="top-[30rem] left-48 absolute scale-[1.9] xl:top-[21rem] xl:left-44 xl:scale-[1.4] rounded dark:border"
             src="/login-bg.png"
             alt="background image"
             width={1920}
             height={1080}
             unoptimized={false}
+            priority
           />
         </div>
       </div>

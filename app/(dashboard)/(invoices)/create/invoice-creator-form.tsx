@@ -66,7 +66,7 @@ function InvoiceCreatorForm({
       products,
       clientId,
     }: invoiceType) => {
-      return await axios.post("/api/create/invoice", {
+      return await axios.post("/api/invoice", {
         invoiceId,
         issuedAt,
         soldAt,

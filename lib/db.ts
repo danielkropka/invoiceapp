@@ -35,6 +35,9 @@ export async function getInvoices(
         include: {
           client: true,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
       newOffset: null,
       totalInvoices: 0,
@@ -57,6 +60,9 @@ export async function getInvoices(
     include: {
       client: true,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
     skip: offset,
     take: 5,
   });
@@ -73,7 +79,7 @@ export async function getPreferredInvoiceId(): Promise<{ id: number | null }> {
   const session = await getAuthSession();
   if (!session?.user) return { id: null };
   const currentDate = new Date();
-  const invoicesInThisMonth = await db.invoice.count({
+  const invoicesThisMonth = await db.invoice.count({
     where: {
       creatorId: session.user.id,
       createdAt: {
@@ -84,7 +90,7 @@ export async function getPreferredInvoiceId(): Promise<{ id: number | null }> {
     },
   });
 
-  return { id: invoicesInThisMonth + 1 };
+  return { id: invoicesThisMonth + 1 };
 }
 
 export async function getClients(
@@ -122,6 +128,9 @@ export async function getClients(
           contains: search,
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return {
@@ -141,6 +150,9 @@ export async function getClients(
     const moreClients = await db.client.findMany({
       where: {
         creatorId: user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
       skip: offset,
       take: 5,

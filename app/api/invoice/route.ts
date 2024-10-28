@@ -45,3 +45,41 @@ export async function POST(req: Request) {
     });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getAuthSession();
+    if (!session?.user) return new Response("Unauthorized", { status: 401 });
+
+    const body = await req.json();
+    const { id }: { id: string } = body;
+
+    /* Check if invoice exists */
+    const invoiceExists = await db.invoice.findFirst({
+      where: {
+        id,
+        creatorId: session.user.id,
+      },
+    });
+
+    if (!invoiceExists)
+      return new Response("Invoice was not found.", { status: 404 });
+
+    await db.invoice.delete({
+      where: {
+        id,
+        creatorId: session.user.id,
+      },
+    });
+
+    return new Response("Invoice created", { status: 200 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return new Response(error.message, { status: 422 });
+    }
+
+    return new Response("There was an error while creating invoice", {
+      status: 500,
+    });
+  }
+}

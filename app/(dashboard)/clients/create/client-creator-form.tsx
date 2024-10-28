@@ -51,7 +51,7 @@ function ClientCreatorForm() {
         phoneNumber,
         taxIdNumber,
       };
-      const { data } = await axios.post("/api/create/client", payload);
+      const { data } = await axios.post("/api/client", payload);
       return data;
     },
     onError: (err) => {
