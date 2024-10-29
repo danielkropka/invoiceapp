@@ -3,7 +3,6 @@ import { db } from "@/lib/prisma";
 import chromium from "@sparticuz/chromium";
 import { Client, Invoice, User } from "@prisma/client";
 import { getInvoiceTemplate } from "@/lib/utils";
-import InvoiceTemplate from "@/components/templates/invoiceTemplate";
 
 export async function POST(req: Request) {
   let browser;
