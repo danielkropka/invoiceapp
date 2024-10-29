@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { startTransition } from "react";
 import {
   Card,
   CardContent,
@@ -67,6 +67,9 @@ function ClientCreatorForm() {
     onSuccess: () => {
       toast.success("Pomyślnie zapisano klienta!");
       router.push("/clients");
+      startTransition(() => {
+        router.refresh();
+      });
     },
   });
 
@@ -200,7 +203,7 @@ function ClientCreatorForm() {
             <Button
               type="submit"
               className="md:self-end md:ml-auto"
-              disabled={isPending}
+              isLoading={isPending}
             >
               Zapisz klienta
             </Button>

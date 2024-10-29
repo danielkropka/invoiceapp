@@ -1,8 +1,7 @@
-import { getInvoices } from "@/lib/db";
 import InvoicesTable from "./invoicesTable";
-import React from "react";
 import { CardContent } from "@/components/ui/card";
 import Pagination from "../../../components/pagination";
+import { getInvoices } from "@/lib/db";
 
 export default async function InvoicesCardContent({
   searchParams,
@@ -11,6 +10,7 @@ export default async function InvoicesCardContent({
 }) {
   const search = searchParams.q ?? "";
   const offset = searchParams.offset ?? 0;
+
   const { invoices, newOffset, totalInvoices } = await getInvoices(
     search,
     Number(offset)

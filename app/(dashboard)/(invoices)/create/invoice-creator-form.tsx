@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { invoiceFormSchema } from "@/lib/validators/validators";
@@ -87,6 +87,9 @@ function InvoiceCreatorForm({
     onSuccess: () => {
       toast.success("Pomyślnie zapisano fakturę!");
       router.push("/");
+      startTransition(() => {
+        router.refresh();
+      });
     },
   });
 
@@ -223,7 +226,7 @@ function InvoiceCreatorForm({
                   <Button
                     type="submit"
                     className="flex gap-1 items-center w-full md:w-fit"
-                    disabled={isPending}
+                    isLoading={isPending}
                   >
                     <PlusCircle className="w-5 h-5" />
                     Zapisz fakturę

@@ -1,13 +1,16 @@
 "use client";
 
+import React from "react";
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { sumAllProducts } from "@/lib/utils";
 import { Product } from "@prisma/client";
 
 export default function Products({ products }: { products: Product[] }) {
@@ -56,6 +59,12 @@ export default function Products({ products }: { products: Product[] }) {
             </TableRow>
           ))}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={7}>Łączna wartość brutto</TableCell>
+            <TableCell>{sumAllProducts(products).toFixed(2)} zł</TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </div>
   );

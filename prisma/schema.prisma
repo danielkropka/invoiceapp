@@ -68,6 +68,7 @@ model User {
   emailVerified DateTime?
   phoneNumber   String?
   address       Address?
+  taxIdNumber   String?
 
   image    String?
   accounts Account[]

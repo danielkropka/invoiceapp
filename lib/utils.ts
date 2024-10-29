@@ -6,6 +6,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const getInvoiceTemplate = async () => {
+  const componentName = `invoiceTemplate`;
+  try {
+    const module = await import(`@/components/templates/${componentName}`);
+    return module.default;
+  } catch (err) {
+    console.error(`Error importing template ${componentName}: ${err}`);
+
+    return null;
+  }
+};
+
 export const sumAllProducts = (products: Product[]) => {
   let sum = 0;
   products.forEach((product) => {

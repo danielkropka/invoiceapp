@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 export default function Pagination({
   offset,
@@ -14,13 +15,16 @@ export default function Pagination({
 }) {
   const router = useRouter();
   const rowsPerPage = 5;
+  const [isPending, startTransition] = useTransition();
 
   const prevPage = () => {
     router.back();
   };
 
   const nextPage = () => {
-    router.push(`?offset=${offset}`, { scroll: false });
+    startTransition(() => {
+      router.push(`?offset=${offset}`, { scroll: false });
+    });
   };
 
   return (
@@ -45,7 +49,11 @@ export default function Pagination({
             disabled={offset >= total}
           >
             Następna
-            <ChevronRight className="ml-2 h-4 w-4" />
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin ml-2" />
+            ) : (
+              <ChevronRight className="ml-2 h-4 w-4" />
+            )}
           </Button>
         </div>
       ) : null}
