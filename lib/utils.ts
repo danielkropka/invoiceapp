@@ -9,8 +9,8 @@ export function cn(...inputs: ClassValue[]) {
 export const getInvoiceTemplate = async () => {
   const componentName = `invoiceTemplate`;
   try {
-    const module = await import(`@/components/templates/${componentName}`);
-    return module.default;
+    const _module = await import(`@/components/templates/${componentName}`);
+    return _module.default;
   } catch (err) {
     console.error(`Error importing template ${componentName}: ${err}`);
 
