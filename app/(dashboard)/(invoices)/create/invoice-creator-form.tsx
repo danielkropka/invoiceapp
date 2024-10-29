@@ -58,7 +58,7 @@ function InvoiceCreatorForm({
   });
   const router = useRouter();
 
-  const { mutate: saveInvoice } = useMutation({
+  const { mutate: saveInvoice, isPending } = useMutation({
     mutationFn: async ({
       invoiceId,
       issuedAt,
@@ -223,6 +223,7 @@ function InvoiceCreatorForm({
                   <Button
                     type="submit"
                     className="flex gap-1 items-center w-full md:w-fit"
+                    disabled={isPending}
                   >
                     <PlusCircle className="w-5 h-5" />
                     Zapisz fakturę
