@@ -43,7 +43,9 @@ export async function POST(req: Request) {
       browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
+        executablePath: await chromium.executablePath(
+          process.env.CHROMIUM_EXECUTABLE_PATH
+        ),
         headless: true,
       });
     } else if (process.env.NODE_ENV === "development") {
