@@ -43,14 +43,17 @@ export async function POST(req: Request) {
       browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
+        executablePath: await chromium.executablePath(
+          process.env.CHROMIUM_EXECUTABLE_PATH
+        ),
+        headless: true,
+        ignoreHTTPSErrors: true,
       });
     } else if (process.env.NODE_ENV === "development") {
       const puppeteer = await import("puppeteer");
       browser = await puppeteer.launch({
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: "shell",
+        headless: "new",
       });
     }
 
@@ -59,7 +62,7 @@ export async function POST(req: Request) {
     const page = await browser.newPage();
     console.log("Page opened");
 
-    await page.setContent(template, {
+    await page.setContent(await template, {
       waitUntil: "networkidle0",
     });
     console.log("Page content set");
@@ -69,7 +72,7 @@ export async function POST(req: Request) {
     });
 
     const pdf = await page.pdf({
-      format: "A4",
+      format: "a4",
       printBackground: true,
     });
 
