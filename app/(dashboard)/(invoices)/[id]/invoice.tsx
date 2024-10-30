@@ -2,12 +2,8 @@
 
 import React, { useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Client, Invoice as InvoiceType, User } from "@prisma/client";
 import { Download, Send } from "lucide-react";
-import moment from "moment";
-import "moment/locale/pl";
-import Products from "./products";
 import InvoiceTemplate from "@/components/templates/invoiceTemplate";
 
 export default function Invoice({
@@ -18,21 +14,6 @@ export default function Invoice({
     client: Client;
   };
 }) {
-  const {
-    name: creatorName,
-    email: creatorEmail,
-    phoneNumber: creatorPhoneNumber,
-    address: creatorAddress,
-    taxIdNumber: creatorTax,
-  } = invoice.creator;
-  const {
-    name: clientName,
-    email: clientEmail,
-    phoneNumber: clientPhoneNumber,
-    address: clientAddress,
-    taxIdNumber: clientTax,
-  } = invoice.client;
-
   const [isPending, startTransition] = useTransition();
 
   const downloadPDF = async () => {
