@@ -1,17 +1,29 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Client, Invoice, User } from "@prisma/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import moment from "moment";
 import "moment/locale/pl";
-/* import Products from "@/app/(dashboard)/(invoices)/[id]/products"; */
+import clsx from "clsx";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { sumAllProducts } from "@/lib/utils";
 
 function InvoiceTemplate({
   invoice,
+  children,
 }: {
   invoice: Invoice & {
     client: Client;
     creator: User;
   };
+  children: ReactNode;
 }) {
   const {
     name: creatorName,
@@ -30,9 +42,14 @@ function InvoiceTemplate({
 
   return (
     <article>
-      <Card>
+      <Card className="h-full">
         <CardHeader>
-          <CardTitle className="border-b pb-4 ">
+          <CardTitle
+            className={clsx("border-b pb-4", {
+              "flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between lg:items-center":
+                children ?? false,
+            })}
+          >
             <span>
               Faktura
               <span className="ml-1 italic">
@@ -40,6 +57,7 @@ function InvoiceTemplate({
                 {invoice.invoiceId}
               </span>
             </span>
+            {children}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -88,7 +106,66 @@ function InvoiceTemplate({
                 </span>
               ) : null}
             </div>
-            {/* <Products products={invoice.products} /> */}
+            <div className="col-span-full border-t pt-4 flex flex-col gap-10">
+              <h2 className="text-2xl font-semibold">Produkty/Usługi</h2>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nazwa produktu/usługi</TableHead>
+                    <TableHead>Opis</TableHead>
+                    <TableHead>Cena netto</TableHead>
+                    <TableHead>Ilość</TableHead>
+                    <TableHead>VAT</TableHead>
+                    <TableHead>Cena brutto</TableHead>
+                    <TableHead>Kwota VAT</TableHead>
+                    <TableHead>Wartość brutto</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoice.products.map((product, index) => (
+                    <React.Fragment key={index}>
+                      <TableRow>
+                        <TableCell>{product.name}</TableCell>
+                        <TableCell>{product.description ?? "-"}</TableCell>
+                        <TableCell>{product.price.toFixed(2)} zł</TableCell>
+                        <TableCell>{product.quantity}</TableCell>
+                        <TableCell>{product.vat}%</TableCell>
+                        <TableCell>
+                          {(
+                            product.price +
+                            (product.price * Number(product.vat)) / 100
+                          ).toFixed(2)}{" "}
+                          zł
+                        </TableCell>
+                        <TableCell>
+                          {(
+                            product.price *
+                            (Number(product.vat) / 100)
+                          ).toFixed(2)}{" "}
+                          zł
+                        </TableCell>
+                        <TableCell>
+                          {(
+                            product.price *
+                            (Number(product.vat) / 100 + 1) *
+                            product.quantity
+                          ).toFixed(2)}{" "}
+                          zł
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell colSpan={7}>Łączna wartość brutto</TableCell>
+                    <TableCell>
+                      {sumAllProducts(invoice.products).toFixed(2)} zł
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
           </div>
         </CardContent>
       </Card>

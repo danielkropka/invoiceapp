@@ -1,6 +1,5 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/prisma";
-import chromium from "@sparticuz/chromium";
 import { Client, Invoice, User } from "@prisma/client";
 import { getInvoiceTemplate } from "@/lib/utils";
 
@@ -38,23 +37,11 @@ export async function POST(req: Request) {
       InvoiceTemplate({ invoice: body })
     );
 
-    if (process.env.NODE_ENV === "production") {
-      const puppeteer = await import("puppeteer-core");
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(
-          process.env.CHROMIUM_EXECUTABLE_PATH
-        ),
-        headless: true,
-      });
-    } else if (process.env.NODE_ENV === "development") {
-      const puppeteer = await import("puppeteer");
-      browser = await puppeteer.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: "shell",
-      });
-    }
+    const puppeteer = await import("puppeteer");
+    browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless: "shell",
+    });
 
     if (!browser) throw new Error("Failed to launch browser");
 
