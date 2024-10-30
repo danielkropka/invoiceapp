@@ -60,37 +60,32 @@ export async function POST(req: Request) {
     if (!browser) throw new Error("Failed to launch browser");
 
     const page = await browser.newPage();
-    console.log("Page opened");
 
     await page.setContent(await template, {
       waitUntil: "networkidle0",
     });
-    console.log("Page content set");
 
     await page.addStyleTag({
       url: process.env.TAILWIND_CDN,
     });
-    console.log("Style tag added");
 
     const pdf = await page.pdf({
       format: "a4",
       printBackground: true,
     });
-    console.log("PDF generated");
 
     for (const page of await browser.pages()) {
       await page.close();
     }
 
     await browser.close();
-    console.log("Browser closed");
 
     const pdfBlob = new Blob([pdf], { type: "application/pdf" });
 
     return new Response(pdfBlob, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename=invoice.pdf`,
+        "Content-Disposition": `inline; filename=${body.invoiceId}.pdf`,
       },
       status: 200,
     });

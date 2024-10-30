@@ -30,7 +30,7 @@ export default function Invoice({
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = `invoice.pdf`;
+        a.download = `${invoice.invoiceId}.pdf`;
         document.body.appendChild(a);
 
         a.click();
