@@ -70,11 +70,13 @@ export async function POST(req: Request) {
     await page.addStyleTag({
       url: process.env.TAILWIND_CDN,
     });
+    console.log("Style tag added");
 
     const pdf = await page.pdf({
       format: "a4",
       printBackground: true,
     });
+    console.log("PDF generated");
 
     for (const page of await browser.pages()) {
       await page.close();
