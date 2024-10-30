@@ -47,7 +47,7 @@ function InvoiceTemplate({
           <CardTitle
             className={clsx("border-b pb-4", {
               "flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between lg:items-center":
-                children ?? false,
+                children,
             })}
           >
             <span>
@@ -61,7 +61,7 @@ function InvoiceTemplate({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             <div className="flex flex-col">
               <span className="text-gray-600">Data wystawienia</span>
               <span>{moment(invoice.issuedAt).format("LL")}</span>
