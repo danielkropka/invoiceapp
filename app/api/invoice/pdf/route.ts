@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     );
 
     if (process.env.NODE_ENV === "production") {
-      const puppeteer = await import("puppeteer");
+      const puppeteer = await import("puppeteer-core");
       browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
