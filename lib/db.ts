@@ -2,18 +2,21 @@ import "server-only";
 
 import { db } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { ExtendedInvoice } from "@/types/db";
 import { Client, Invoice } from "@prisma/client";
 
 /* function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
  */
+type InvoiceType = Invoice & {
+  client: Client;
+};
+
 export async function getInvoices(
   search: string,
   offset: number
 ): Promise<{
-  invoices: ExtendedInvoice[];
+  invoices: InvoiceType[];
   newOffset: number | null;
   totalInvoices: number;
 }> {
