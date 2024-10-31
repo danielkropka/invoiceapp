@@ -23,6 +23,7 @@ function ClientsTable({ clients }: { clients: ClientType[] }) {
             <TableRow>
               <TableHead className="hidden md:table-cell">E-mail</TableHead>
               <TableHead>Nazwa</TableHead>
+              <TableHead>Miasto</TableHead>
               <TableHead className="hidden md:table-cell">
                 Data utworzenia
               </TableHead>

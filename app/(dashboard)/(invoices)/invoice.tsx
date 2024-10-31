@@ -87,7 +87,7 @@ function Invoice({ invoice }: { invoice: InvoiceType }) {
               <DialogTitle>Czy na pewno chcesz kontynuować?</DialogTitle>
               <DialogDescription>
                 Tej operacji nie można cofnąć. Spowoduje ona trwałe usunięcie
-                Twojej faktury z naszych serwerów.
+                faktury z naszych serwerów.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

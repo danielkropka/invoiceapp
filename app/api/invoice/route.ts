@@ -72,13 +72,13 @@ export async function DELETE(req: Request) {
       },
     });
 
-    return new Response("Invoice created", { status: 200 });
+    return new Response("Invoice deleted", { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return new Response(error.message, { status: 422 });
     }
 
-    return new Response("There was an error while creating invoice", {
+    return new Response("There was an error while deleting invoice", {
       status: 500,
     });
   }

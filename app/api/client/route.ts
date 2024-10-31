@@ -43,3 +43,41 @@ export async function POST(req: Request) {
     });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getAuthSession();
+    if (!session?.user) return new Response("Unauthorized", { status: 401 });
+
+    const body = await req.json();
+    const { id }: { id: string } = body;
+
+    /* Check if client exists */
+    const clientExists = await db.client.findFirst({
+      where: {
+        id,
+        creatorId: session.user.id,
+      },
+    });
+
+    if (!clientExists)
+      return new Response("Client was not found.", { status: 404 });
+
+    await db.client.delete({
+      where: {
+        id,
+        creatorId: session.user.id,
+      },
+    });
+
+    return new Response("Client deleted", { status: 200 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return new Response(error.message, { status: 422 });
+    }
+
+    return new Response("There was an error while deleting client", {
+      status: 500,
+    });
+  }
+}
