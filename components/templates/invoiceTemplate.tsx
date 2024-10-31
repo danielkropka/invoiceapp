@@ -116,7 +116,7 @@ function InvoiceTemplate({
                     <TableHead>Cena netto</TableHead>
                     <TableHead>Ilość</TableHead>
                     <TableHead>VAT</TableHead>
-                    <TableHead>Cena brutto</TableHead>
+                    <TableHead>Wartość netto</TableHead>
                     <TableHead>Kwota VAT</TableHead>
                     <TableHead>Wartość brutto</TableHead>
                   </TableRow>
@@ -131,16 +131,13 @@ function InvoiceTemplate({
                         <TableCell>{product.quantity}</TableCell>
                         <TableCell>{product.vat}%</TableCell>
                         <TableCell>
-                          {(
-                            product.price +
-                            (product.price * Number(product.vat)) / 100
-                          ).toFixed(2)}{" "}
-                          zł
+                          {(product.price * product.quantity).toFixed(2)} zł
                         </TableCell>
                         <TableCell>
                           {(
                             product.price *
-                            (Number(product.vat) / 100)
+                            (Number(product.vat) / 100) *
+                            product.quantity
                           ).toFixed(2)}{" "}
                           zł
                         </TableCell>

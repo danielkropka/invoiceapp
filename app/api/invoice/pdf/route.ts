@@ -61,7 +61,7 @@ export async function POST(req: Request) {
 
     const page = await browser.newPage();
 
-    await page.setContent(await template, {
+    await page.setContent(template, {
       waitUntil: "networkidle0",
     });
 
