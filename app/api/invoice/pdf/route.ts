@@ -1,8 +1,15 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/prisma";
-import { Client, Invoice, User } from "@prisma/client";
 import { getInvoiceTemplate } from "@/lib/utils";
 import chromium from "@sparticuz/chromium";
+import { createClient } from "redis";
+import { ExtendedInvoice } from "@/types/db";
+
+const redisClient = createClient({
+  url: process.env.REDIS_URL,
+});
+
+redisClient.connect();
 
 export async function POST(req: Request) {
   let browser;
@@ -11,10 +18,7 @@ export async function POST(req: Request) {
     const session = await getAuthSession();
     if (!session?.user) return new Response("Unauthorized", { status: 401 });
 
-    const body: Invoice & {
-      client: Client;
-      creator: User;
-    } = await req.json();
+    const body: ExtendedInvoice = await req.json();
 
     const client = await db.client.findFirst({
       where: {
@@ -31,6 +35,21 @@ export async function POST(req: Request) {
     });
 
     if (!user) return new Response("User was not found", { status: 404 });
+
+    const cachedPDF = await redisClient.get(body.id);
+    if (cachedPDF) {
+      return new Response(
+        new Blob([Buffer.from(cachedPDF, "binary")], {
+          type: "application/pdf",
+        }),
+        {
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `inline; filename=${body.invoiceId}.pdf`,
+          },
+        }
+      );
+    }
 
     const ReactDOMServer = (await import("react-dom/server")).default;
     const InvoiceTemplate = await getInvoiceTemplate();
@@ -81,6 +100,8 @@ export async function POST(req: Request) {
     await browser.close();
 
     const pdfBlob = new Blob([pdf], { type: "application/pdf" });
+
+    await redisClient.setEx(body.id, 3600, pdf.toString("binary"));
 
     return new Response(pdfBlob, {
       headers: {
