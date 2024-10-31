@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ExternalLink, MoreHorizontal, Trash2 } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { ExtendedInvoice } from "@/types/db";
+import { InvoiceType } from "@/types/db";
 import moment from "moment";
 import "moment/locale/pl";
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +29,7 @@ import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
+function Invoice({ invoice }: { invoice: InvoiceType }) {
   let timeout: NodeJS.Timeout | undefined = undefined;
   const router = useRouter();
 

@@ -9,9 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Invoice from "@/app/(dashboard)/(invoices)/invoice";
-import { ExtendedInvoice } from "@/types/db";
+import { InvoiceType } from "@/types/db";
 
-function InvoicesTable({ invoices }: { invoices: ExtendedInvoice[] }) {
+function InvoicesTable({ invoices }: { invoices: InvoiceType[] }) {
   return (
     <Table>
       <TableHeader>

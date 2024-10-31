@@ -3,14 +3,12 @@ import "server-only";
 import { db } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { Client, Invoice } from "@prisma/client";
+import { InvoiceType } from "@/types/db";
 
 /* function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
  */
-type InvoiceType = Invoice & {
-  client: Client;
-};
 
 export async function getInvoices(
   search: string,
