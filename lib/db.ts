@@ -85,7 +85,7 @@ export async function getPreferredInvoiceId(): Promise<{ id: number | null }> {
       creatorId: session.user.id,
       createdAt: {
         gt: new Date(
-          `${currentDate.getFullYear}-${currentDate.getMonth() + 1}-1`
+          `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-1`
         ),
       },
     },
