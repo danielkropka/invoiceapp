@@ -81,9 +81,7 @@ function Client({ client }: { client: ClientType }) {
                               });
                               resolve("Success");
                               toast.dismiss(t);
-                              toast.success(
-                                "Pomyślnie usunięto klienta z Twojego konta."
-                              );
+                              toast.success("Pomyślnie usunięto klienta.");
                             } catch (err) {
                               timeout = undefined;
 
