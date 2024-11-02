@@ -4,14 +4,16 @@ import "moment/locale/pl";
 export default function EmailTemplate({
   sentToName,
   invoiceDetails,
+  token,
 }: {
   sentToName: string;
   invoiceDetails: {
     id: string;
     issuedDate: Date;
   };
+  token: string;
 }) {
-  const { id, issuedDate } = invoiceDetails;
+  const { id: invoiceId, issuedDate } = invoiceDetails;
 
   return (
     <>
@@ -24,7 +26,7 @@ export default function EmailTemplate({
       </h2>
       <p>
         Dziękujemy za skorzystanie z naszych usług. W załączniku przesyłamy
-        fakturę nr <strong>{id}</strong> z dnia{" "}
+        fakturę nr <strong>{invoiceId}</strong> z dnia&nbsp
         <strong>{moment(issuedDate).format("LL")}</strong>.
       </p>
       <p>
@@ -33,6 +35,10 @@ export default function EmailTemplate({
       </p>
 
       <p>Dziękujemy za terminowe uregulowanie należności.</p>
+      {/* TODO: Button to confirm, and send notification to user that invoice was paid, and he can change invoice status to paid */}
+      <a href={`https://www.fakturly.pl/confirm-invoice?token=${token}`}>
+        <button type="button">Potwierdź opłacenie faktury.</button>
+      </a>
 
       <p>
         Pozdrawiamy serdecznie, Zespół <strong>Fakturly</strong>

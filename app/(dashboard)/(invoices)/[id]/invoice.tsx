@@ -6,13 +6,14 @@ import { Download, Send } from "lucide-react";
 import InvoiceTemplate from "@/components/templates/invoiceTemplate";
 import { useInvoiceContext } from "@/contexts/invoiceContext";
 import { ExtendedInvoice } from "@/types/db";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
   const [isGenerating, startTransitionGenerate] = useTransition();
   const [isSending, startTransitionSending] = useTransition();
   const { generatePDF, downloadPDF, invoicePDF, sentEmail } =
     useInvoiceContext();
+  const router = useRouter();
 
   const handleGenerate = () => {
     startTransitionGenerate(async () => {
@@ -30,30 +31,23 @@ export default function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
 
   const handleSentEmail = async () => {
     startTransitionSending(async () => {
-      try {
-        if (invoicePDF.size == 0) {
-          await generatePDF(invoice);
-        }
-        const pdfArrayBuffer = await invoicePDF.arrayBuffer();
-        const pdfBuffer = Buffer.from(pdfArrayBuffer);
-
-        sentEmail(
-          invoice.client.email,
-          invoice.client.name,
-          {
-            id: invoice.invoiceId,
-            issuedDate: invoice.issuedAt,
-          },
-          pdfBuffer
-        );
-
-        toast.success("Pomyślnie wysłano e-mail'a do klienta.");
-      } catch (err) {
-        console.log(err);
-        toast.error(
-          "Wystąpił błąd podczas wysyłania e-mail'a. Spróbuj ponownie później."
-        );
+      if (invoicePDF.size == 0) {
+        await generatePDF(invoice);
       }
+      const pdfArrayBuffer = await invoicePDF.arrayBuffer();
+      const pdfBuffer = Buffer.from(pdfArrayBuffer);
+
+      sentEmail({
+        token: invoice.token,
+        email: invoice.client.email,
+        invoiceDetails: {
+          id: invoice.invoiceId,
+          issuedDate: invoice.issuedAt,
+        },
+        clientName: invoice.client.name,
+        attachment: pdfBuffer,
+      });
+      router.refresh();
     });
   };
 
@@ -86,9 +80,14 @@ export default function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
           variant={"outline"}
           onClick={handleSentEmail}
           isLoading={isSending}
+          disabled={invoice.status === "PENDING" || isSending}
         >
           <Send className="w-5 h-5" />
-          {isSending ? "Trwa wysyłanie e-mail'a" : "Wyślij na e-mail klienta"}
+          {isSending
+            ? "Trwa wysyłanie e-mail'a"
+            : invoice.status === "PENDING"
+            ? "E-mail już został wysłany"
+            : "Wyślij na e-mail klienta"}
         </Button>
       </div>
     </InvoiceTemplate>

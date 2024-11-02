@@ -8,3 +8,14 @@ export type ExtendedInvoice = Invoice & {
 export type InvoiceType = Invoice & {
   client: Client;
 };
+
+export type SendEmailToClientType = {
+  email: string;
+  clientName: string;
+  invoiceDetails: {
+    id: string;
+    issuedDate: Date;
+  };
+  token: string;
+  attachment: Buffer;
+};

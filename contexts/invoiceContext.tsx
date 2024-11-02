@@ -1,4 +1,5 @@
-import { ExtendedInvoice } from "@/types/db";
+import { ExtendedInvoice, SendEmailToClientType } from "@/types/db";
+import axios, { AxiosError } from "axios";
 import {
   createContext,
   ReactNode,
@@ -12,15 +13,7 @@ const defaultContext = {
   invoicePDF: new Blob(),
   generatePDF: async (invoice: ExtendedInvoice) => {},
   downloadPDF: (name: string) => {},
-  sentEmail: (
-    email: string,
-    clientName: string,
-    invoiceDetails: {
-      id: string;
-      issuedDate: Date;
-    },
-    attachment: Buffer
-  ) => {},
+  sentEmail: (data: SendEmailToClientType) => {},
 };
 
 export const InvoiceContext = createContext(defaultContext);
@@ -66,27 +59,24 @@ export const InvoiceContextProvider = ({
     }
   };
 
-  const sentEmail = async (
-    email: string,
-    clientName: string,
-    invoiceDetails: {
-      id: string;
-      issuedDate: Date;
-    },
-    attachment: Buffer
-  ) => {
+  const sentEmail = async (data: SendEmailToClientType) => {
     try {
-      await fetch("/api/invoice/send", {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          clientName,
-          invoiceDetails,
-          attachment,
-        }),
+      const { email, attachment, clientName, token, invoiceDetails } = data;
+      await axios.post("/api/invoice/send", {
+        email,
+        clientName,
+        invoiceDetails,
+        token,
+        attachment,
       });
+
+      toast.success("Pomyślnie wysłano e-mail'a do klienta.");
     } catch (err) {
-      console.log(err);
+      if (err instanceof AxiosError)
+        if (err.status === 409) return toast.info("E-mail został już wysłany.");
+      toast.error(
+        "Wystąpił błąd podczas wysyłania e-mail'a. Spróbuj ponownie później."
+      );
     }
   };
 
