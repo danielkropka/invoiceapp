@@ -6,11 +6,21 @@ import {
   useContext,
   useState,
 } from "react";
+import { toast } from "sonner";
 
 const defaultContext = {
   invoicePDF: new Blob(),
   generatePDF: async (invoice: ExtendedInvoice) => {},
   downloadPDF: (name: string) => {},
+  sentEmail: (
+    email: string,
+    clientName: string,
+    invoiceDetails: {
+      id: string;
+      issuedDate: Date;
+    },
+    attachment: Buffer
+  ) => {},
 };
 
 export const InvoiceContext = createContext(defaultContext);
@@ -35,6 +45,9 @@ export const InvoiceContextProvider = ({
       setInvoicePDF(await res.blob());
     } catch (err) {
       console.log(err);
+      toast.error(
+        "Wystąpił błąd w trakcie generowania faktury. Spróbuj ponownie później."
+      );
     }
   }, []);
 
@@ -53,12 +66,37 @@ export const InvoiceContextProvider = ({
     }
   };
 
+  const sentEmail = async (
+    email: string,
+    clientName: string,
+    invoiceDetails: {
+      id: string;
+      issuedDate: Date;
+    },
+    attachment: Buffer
+  ) => {
+    try {
+      await fetch("/api/invoice/send", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          clientName,
+          invoiceDetails,
+          attachment,
+        }),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <InvoiceContext.Provider
       value={{
         generatePDF,
         invoicePDF,
         downloadPDF,
+        sentEmail,
       }}
     >
       {children}
