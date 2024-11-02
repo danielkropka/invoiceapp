@@ -105,6 +105,8 @@ function Invoice({ invoice }: { invoice: InvoiceType }) {
                                 data: { id: invoice.id },
                               });
                               resolve("Success");
+                              toast.dismiss(t);
+                              toast.success("Pomyślnie usunięto fakturę.");
                             } catch (err) {
                               timeout = undefined;
 
