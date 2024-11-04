@@ -44,7 +44,7 @@ function Invoice({ invoice }: { invoice: InvoiceType }) {
           {invoice.status === "PAID"
             ? "zapłacono"
             : invoice.status === "PENDING"
-            ? "oczekuje"
+            ? "wysłano"
             : "niezapłacono"}
         </Badge>
       </TableCell>

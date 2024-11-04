@@ -95,6 +95,7 @@ model Client {
 
 model Invoice {
   id            String  @id @default(cuid()) @map("_id")
+  token         String  @default(cuid())
   invoiceId     String  @unique
   status        Status?
   paymentMethod Method?
