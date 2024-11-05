@@ -1,5 +1,4 @@
 import { getAuthSession } from "@/lib/auth";
-import { db } from "@/lib/prisma";
 import { getInvoiceTemplate } from "@/lib/utils";
 import chromium from "@sparticuz/chromium";
 import { createClient } from "redis";
@@ -19,22 +18,6 @@ export async function POST(req: Request) {
     if (!session?.user) return new Response("Unauthorized", { status: 401 });
 
     const body: ExtendedInvoice = await req.json();
-
-    const client = await db.client.findFirst({
-      where: {
-        id: body.clientId,
-      },
-    });
-
-    if (!client) return new Response("Client was not found", { status: 404 });
-
-    const user = await db.user.findFirst({
-      where: {
-        id: session.user.id,
-      },
-    });
-
-    if (!user) return new Response("User was not found", { status: 404 });
 
     const cachedPDF = await redisClient.get(body.id);
     if (cachedPDF) {
