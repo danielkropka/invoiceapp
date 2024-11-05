@@ -26,7 +26,7 @@ export default function EmailTemplate({
       </h2>
       <p>
         Dziękujemy za skorzystanie z naszych usług. W załączniku przesyłamy
-        fakturę nr <strong>{invoiceId}</strong> z dnia&nbsp
+        fakturę nr <strong>{invoiceId}</strong> z dnia&nbsp;
         <strong>{moment(issuedDate).format("LL")}</strong>.
       </p>
       <p>

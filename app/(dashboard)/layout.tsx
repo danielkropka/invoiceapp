@@ -12,6 +12,7 @@ import { ModeToggle } from "./mode-toggle";
 import { cn } from "@/lib/utils";
 import { getAuthSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
+import { Notification } from "@prisma/client";
 
 export default async function DashboardLayout({
   children,
@@ -20,6 +21,15 @@ export default async function DashboardLayout({
 }) {
   const session = await getAuthSession();
   if (!session?.user) return notFound();
+
+  const CountUnreadNotify = (notifications: Notification[]) => {
+    let total = 0;
+    notifications.forEach((notification) => {
+      total += !notification.read ? 1 : 0;
+    });
+
+    return total;
+  };
 
   return (
     <Providers>
@@ -40,7 +50,7 @@ export default async function DashboardLayout({
               >
                 <Bell className="w-5 h-5" />
               </Link>
-              {session.user.notifications.length > 0 ? (
+              {CountUnreadNotify(session.user.notifications) > 0 ? (
                 <span className="absolute flex h-3 w-3 top-0 right-0 -mt-1 -mr-1">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>

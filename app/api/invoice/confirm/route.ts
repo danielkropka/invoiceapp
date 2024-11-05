@@ -22,7 +22,16 @@ export async function POST(req: Request) {
     });
 
     if (!invoiceCreator)
-      return new Response("Creator of invoice was not found.", { status: 404 });
+      return new Response("Creator of invoice was not found.", {
+        status: 404,
+      });
+
+    if (
+      invoiceCreator.notifications.find(
+        (notification) => notification.invoiceId === invoiceToConfirm.invoiceId
+      )
+    )
+      return new Response("Notification was already sent.", { status: 409 });
 
     await db.user.update({
       where: {
