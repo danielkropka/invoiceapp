@@ -20,22 +20,6 @@ export async function POST(req: Request) {
 
     const body: ExtendedInvoice = await req.json();
 
-    const client = await db.client.findFirst({
-      where: {
-        id: body.clientId,
-      },
-    });
-
-    if (!client) return new Response("Client was not found", { status: 404 });
-
-    const user = await db.user.findFirst({
-      where: {
-        id: session.user.id,
-      },
-    });
-
-    if (!user) return new Response("User was not found", { status: 404 });
-
     const cachedPDF = await redisClient.get(body.id);
     if (cachedPDF) {
       return new Response(
