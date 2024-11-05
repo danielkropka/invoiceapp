@@ -4,7 +4,8 @@ export async function POST(req: Request) {
   try {
     const body: { token: string } = await req.json();
 
-    const invoiceToConfirm = db.invoice.findFirst({
+    const invoiceToConfirm = await db.invoice.findFirst({
+      select: { creatorId: true, invoiceId: true },
       where: {
         token: body.token,
       },
@@ -12,6 +13,33 @@ export async function POST(req: Request) {
 
     if (!invoiceToConfirm)
       return new Response("Invoice was not found.", { status: 404 });
+
+    const invoiceCreator = await db.user.findFirst({
+      select: { notifications: true, id: true },
+      where: {
+        id: invoiceToConfirm.creatorId,
+      },
+    });
+
+    if (!invoiceCreator)
+      return new Response("Creator of invoice was not found.", { status: 404 });
+
+    await db.user.update({
+      where: {
+        id: invoiceCreator.id,
+      },
+      data: {
+        notifications: [
+          ...invoiceCreator.notifications,
+          {
+            invoiceId: invoiceToConfirm.invoiceId,
+            type: "CONFIRM_INVOICE",
+            read: false,
+            createdAt: new Date(),
+          },
+        ],
+      },
+    });
 
     return new Response("Notify sent", { status: 200 });
   } catch (err) {
