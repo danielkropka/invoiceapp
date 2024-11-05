@@ -14,10 +14,12 @@ export default function DashboardBreadCrumb() {
   const paths = usePathname();
   const pathNames = paths.split("/").filter((path) => path);
   const convertPathNames = (path: string) => {
-    if (path.length > 10) {
+    if (path.length > 15) {
       return "Szczegóły faktury";
     }
     switch (path) {
+      case "notifications":
+        return "Powiadomienia";
       case "clients":
         return "Klienci";
       case "create":
