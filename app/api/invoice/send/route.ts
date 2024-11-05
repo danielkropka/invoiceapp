@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     if (!invoiceExists)
       return new Response("Invoice was not found.", { status: 404 });
 
-    if (invoiceExists.status !== "UNPAID")
+    if (invoiceExists.status === "PENDING" || invoiceExists.status === "PAID")
       return new Response("Notification to client was already sent.", {
         status: 409,
       });
