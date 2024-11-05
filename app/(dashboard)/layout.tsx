@@ -1,20 +1,26 @@
 import React from "react";
 import NavItem from "@/app/(dashboard)/nav-item";
-import { Home, PanelLeft, Settings, Users2 } from "lucide-react";
+import { Bell, Home, PanelLeft, Settings, Users2 } from "lucide-react";
 import Providers from "@/app/(dashboard)/providers";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import User from "@/app/(dashboard)/user";
 import { SearchInput } from "@/app/(dashboard)/search";
 import DashboardBreadCrumb from "./breadcrumb";
 import { ModeToggle } from "./mode-toggle";
+import { cn } from "@/lib/utils";
+import { getAuthSession } from "@/lib/auth";
+import { notFound } from "next/navigation";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getAuthSession();
+  if (!session?.user) return notFound();
+
   return (
     <Providers>
       <main className="flex flex-col min-h-screen w-full bg-muted/40">
@@ -25,6 +31,23 @@ export default function DashboardLayout({
             <DashboardBreadCrumb />
             <SearchInput />
             <User />
+            <span className="relative inline-flex">
+              <Link
+                className={cn(
+                  buttonVariants({ size: "icon", variant: "outline" })
+                )}
+                href={"/notifications"}
+              >
+                <Bell className="w-5 h-5" />
+              </Link>
+              {session.user.notifications.length > 0 ? (
+                <span className="absolute flex h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                </span>
+              ) : null}
+            </span>
+
             <ModeToggle />
           </header>
           <main className="grid flex-1 items-start gap-2 px-4 py-2 sm:px-6 sm:py-2 md:gap-4 bg-muted/40">
@@ -46,11 +69,6 @@ function DesktopNav() {
 
         <NavItem href={"/clients"} label={"Klienci"}>
           <Users2 className="w-5 h-5" />
-        </NavItem>
-      </nav>
-      <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-        <NavItem href={"/settings"} label={"Ustawienia"}>
-          <Settings className="w-5 h-5" />
         </NavItem>
       </nav>
     </aside>

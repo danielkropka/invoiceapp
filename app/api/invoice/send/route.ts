@@ -15,6 +15,11 @@ export async function POST(req: Request) {
 
     /* Check if invoice exists */
     const invoiceExists = await db.invoice.findFirst({
+      select: {
+        status: true,
+        token: true,
+        id: true,
+      },
       where: {
         invoiceId: body.invoiceDetails.id,
         creatorId: session.user.id,
@@ -24,7 +29,7 @@ export async function POST(req: Request) {
     if (!invoiceExists)
       return new Response("Invoice was not found.", { status: 404 });
 
-    if (invoiceExists.status === "PENDING")
+    if (invoiceExists.status !== "UNPAID")
       return new Response("Notification to client was already sent.", {
         status: 409,
       });

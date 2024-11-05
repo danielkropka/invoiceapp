@@ -20,6 +20,10 @@ enum Method {
   BANK_TRANSFER
 }
 
+enum NotificationType {
+  CONFIRM_INVOICE
+}
+
 type Address {
   street     String
   postalCode String
@@ -32,6 +36,14 @@ type Product {
   price       Float
   quantity    Int
   vat         String
+}
+
+type Notification {
+  type      NotificationType
+  invoiceId String?
+  read      Boolean          @default(false)
+
+  createdAt DateTime @default(now())
 }
 
 model Account {
@@ -69,6 +81,8 @@ model User {
   phoneNumber   String?
   address       Address?
   taxIdNumber   String?
+
+  notifications Notification[]
 
   image    String?
   accounts Account[]

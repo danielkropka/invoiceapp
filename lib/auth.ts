@@ -9,7 +9,7 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/sign-in"
+    signIn: "/sign-in",
   },
   providers: [
     GoogleProvider({
@@ -24,6 +24,7 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.name = token.name;
         session.user.image = token.picture;
+        session.user.notifications = token.notifications;
       }
 
       return session;
@@ -45,9 +46,12 @@ export const authOptions: NextAuthOptions = {
         name: dbUser.name,
         email: dbUser.email,
         picture: dbUser.image,
+        notifications: dbUser.notifications,
       };
     },
-    redirect() { return "/" },
+    redirect() {
+      return "/";
+    },
   },
 };
 
