@@ -1,5 +1,4 @@
 import { getAuthSession } from "@/lib/auth";
-import { db } from "@/lib/prisma";
 import { getInvoiceTemplate } from "@/lib/utils";
 import chromium from "@sparticuz/chromium";
 import { createClient } from "redis";
