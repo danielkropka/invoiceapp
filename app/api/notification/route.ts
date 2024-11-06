@@ -24,6 +24,8 @@ export async function PATCH(req: Request) {
       status: 200,
     });
   } catch (err) {
+    console.log(err);
+
     return new Response(
       "There was an error while changing notification read property",
       { status: 500 }
