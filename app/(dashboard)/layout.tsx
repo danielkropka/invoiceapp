@@ -11,7 +11,7 @@ import DashboardBreadCrumb from "./breadcrumb";
 import { ModeToggle } from "./mode-toggle";
 import { cn } from "@/lib/utils";
 import { getAuthSession } from "@/lib/auth";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Notification } from "@prisma/client";
 
 export default async function DashboardLayout({
@@ -20,7 +20,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await getAuthSession();
-  if (!session?.user) return notFound();
+  if (!session?.user) return redirect("/sign-in");
 
   const CountUnreadNotify = (notifications: Notification[]) => {
     let total = 0;
