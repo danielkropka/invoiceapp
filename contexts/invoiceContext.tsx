@@ -46,11 +46,11 @@ export const InvoiceContextProvider = ({
         attachment,
       });
 
-      toast.success("Pomyślnie wysłano e-mail'a do klienta.");
+      return toast.success("Pomyślnie wysłano e-mail'a do klienta.");
     } catch (err) {
       if (err instanceof AxiosError)
         if (err.status === 409) return toast.info("E-mail został już wysłany.");
-      toast.error(
+      return toast.error(
         "Wystąpił błąd podczas wysyłania e-mail'a. Spróbuj ponownie później."
       );
     }

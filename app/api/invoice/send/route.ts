@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         status: 409,
       });
 
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: "Fakturly <invoices@fakturly.pl>",
       to: [body.email],
       subject: "Twoja faktura",
@@ -51,6 +51,8 @@ export async function POST(req: Request) {
         },
       ],
     });
+
+    if (error) return new Response("Failed to send email", { status: 500 });
 
     await db.invoice.update({
       where: {
