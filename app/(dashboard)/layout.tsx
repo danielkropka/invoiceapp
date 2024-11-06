@@ -11,7 +11,7 @@ import DashboardBreadCrumb from "./breadcrumb";
 import { ModeToggle } from "./mode-toggle";
 import { cn } from "@/lib/utils";
 import { getAuthSession } from "@/lib/auth";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Notification } from "@prisma/client";
 
 export default async function DashboardLayout({
