@@ -24,9 +24,11 @@ export default async function InvoicePage({
     },
   });
 
-  return !invoice ? (
-    <div>Nieznaleziono faktury na Naszym serwerze.</div>
-  ) : (
-    <Invoice invoice={invoice} />
-  );
+  if (!invoice) return notFound();
+  if (invoice.file) {
+    invoice.fileBase64 = invoice.file.toString("base64");
+    invoice.file = null;
+  }
+
+  return <Invoice invoice={invoice} />;
 }

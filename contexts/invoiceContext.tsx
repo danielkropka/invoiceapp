@@ -1,18 +1,10 @@
 import { ExtendedInvoice, SendEmailToClientType } from "@/types/db";
 import axios, { AxiosError } from "axios";
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { toast } from "sonner";
 
 const defaultContext = {
-  invoicePDF: new Blob(),
-  generatePDF: async (invoice: ExtendedInvoice) => {},
-  downloadPDF: (name: string) => {},
+  downloadPDF: (file: string, fileName: string) => {},
   sentEmail: (data: SendEmailToClientType) => {},
 };
 
@@ -26,31 +18,15 @@ export const InvoiceContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [invoicePDF, setInvoicePDF] = useState<Blob>(new Blob());
+  const downloadPDF = (file: string, fileName: string) => {
+    const invoicePDF = new Blob([Buffer.from(file, "base64")]);
 
-  const generatePDF = useCallback(async (invoice: ExtendedInvoice) => {
-    try {
-      const res = await fetch("/api/invoice/pdf", {
-        method: "POST",
-        body: JSON.stringify(invoice),
-      });
-
-      setInvoicePDF(await res.blob());
-    } catch (err) {
-      console.log(err);
-      toast.error(
-        "Wystąpił błąd w trakcie generowania faktury. Spróbuj ponownie później."
-      );
-    }
-  }, []);
-
-  const downloadPDF = (name: string) => {
     if (invoicePDF instanceof Blob && invoicePDF.size > 0) {
       const url = window.URL.createObjectURL(invoicePDF);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${name}.pdf`;
+      a.download = `${fileName}.pdf`;
       document.body.appendChild(a);
 
       a.click();
@@ -83,8 +59,6 @@ export const InvoiceContextProvider = ({
   return (
     <InvoiceContext.Provider
       value={{
-        generatePDF,
-        invoicePDF,
         downloadPDF,
         sentEmail,
       }}

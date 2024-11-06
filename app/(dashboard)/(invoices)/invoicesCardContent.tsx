@@ -16,6 +16,8 @@ export default async function InvoicesCardContent({
     Number(offset)
   );
 
+  invoices.forEach((invoice) => (invoice.file = null));
+
   return (
     <>
       <CardContent>

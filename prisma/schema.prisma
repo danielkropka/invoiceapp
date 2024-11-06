@@ -124,4 +124,9 @@ model Invoice {
   creatorId String
   client    Client @relation(fields: [clientId], references: [id])
   clientId  String
+
+  file        Bytes?
+  fileBase64  String?
+  fileName    String? @default("invoice.pdf")
+  contentType String? @default("application/pdf")
 }

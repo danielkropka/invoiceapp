@@ -17,5 +17,5 @@ export type SendEmailToClientType = {
     issuedDate: Date;
   };
   token: string;
-  attachment: Buffer;
+  attachment: string;
 };

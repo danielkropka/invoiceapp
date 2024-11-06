@@ -1,9 +1,13 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/prisma";
+import { getInvoiceTemplate } from "@/lib/utils";
 import { invoiceFormSchema } from "@/lib/validators/validators";
+import chromium from "@sparticuz/chromium";
 import { z } from "zod";
 
 export async function POST(req: Request) {
+  let browser;
+
   try {
     const session = await getAuthSession();
     if (!session?.user) return new Response("Unauthorized", { status: 401 });
@@ -23,7 +27,7 @@ export async function POST(req: Request) {
         status: 400,
       });
 
-    await db.invoice.create({
+    const invoice = await db.invoice.create({
       data: {
         invoiceId,
         issuedAt,
@@ -31,6 +35,68 @@ export async function POST(req: Request) {
         products,
         clientId,
         creatorId: session.user.id,
+      },
+      include: {
+        creator: true,
+        client: true,
+      },
+    });
+
+    const ReactDOMServer = (await import("react-dom/server")).default;
+    const InvoiceTemplate = await getInvoiceTemplate();
+    const template = ReactDOMServer.renderToStaticMarkup(
+      InvoiceTemplate({ invoice })
+    );
+
+    if (process.env.NODE_ENV === "production") {
+      const puppeteer = await import("puppeteer-core");
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(
+          process.env.CHROMIUM_EXECUTABLE_PATH
+        ),
+        headless: true,
+        ignoreHTTPSErrors: true,
+      });
+    } else if (process.env.NODE_ENV === "development") {
+      const puppeteer = await import("puppeteer");
+      browser = await puppeteer.launch({
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        headless: "new",
+      });
+    }
+
+    if (!browser) throw new Error("Failed to launch browser");
+
+    const page = await browser.newPage();
+
+    await page.setContent(template, {
+      waitUntil: "networkidle0",
+    });
+
+    await page.addStyleTag({
+      url: process.env.TAILWIND_CDN,
+    });
+
+    const pdf = await page.pdf({
+      format: "a4",
+      printBackground: true,
+    });
+
+    for (const page of await browser.pages()) {
+      await page.close();
+    }
+
+    await browser.close();
+
+    await db.invoice.update({
+      where: {
+        id: invoice.id,
+      },
+      data: {
+        file: pdf,
+        fileName: invoice.invoiceId,
       },
     });
 

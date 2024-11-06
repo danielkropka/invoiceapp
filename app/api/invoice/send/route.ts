@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         {
           filename: "invoice.pdf",
           contentType: "pdf",
-          content: body.attachment,
+          content: Buffer.from(body.attachment, "base64"),
         },
       ],
     });
