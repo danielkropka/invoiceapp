@@ -36,7 +36,7 @@ export default function Pagination({
             variant="ghost"
             size="sm"
             type="submit"
-            disabled={offset === rowsPerPage}
+            disabled={offset <= rowsPerPage}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Poprzednia
