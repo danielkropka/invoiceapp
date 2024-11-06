@@ -1,13 +1,21 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Notification as NotifyType } from "@prisma/client";
+import axios from "axios";
 import moment from "moment";
 import "moment/locale/pl";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 export default function Notification({
   notification,
 }: {
   notification: NotifyType;
 }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   return (
     <div className="border p-4 rounded">
       <div className="w-full flex">
@@ -36,7 +44,24 @@ export default function Notification({
               </span>
               .
             </span>
-            <Button size={"sm"}>
+            <Button
+              size={"sm"}
+              onClick={() => {
+                startTransition(async () => {
+                  try {
+                    await axios.patch("/api/notification", {
+                      read: !notification.read,
+                      id: notification.invoiceId,
+                    });
+
+                    router.refresh();
+                  } catch (err) {
+                    console.log(err);
+                  }
+                });
+              }}
+              isLoading={isPending}
+            >
               {notification.read
                 ? "Oznacz jako nieprzeczytane"
                 : "Oznacz jako przeczytane"}
