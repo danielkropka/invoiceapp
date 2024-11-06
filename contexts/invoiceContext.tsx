@@ -1,6 +1,6 @@
-import { ExtendedInvoice, SendEmailToClientType } from "@/types/db";
+import { SendEmailToClientType } from "@/types/db";
 import axios, { AxiosError } from "axios";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { toast } from "sonner";
 
 const defaultContext = {
