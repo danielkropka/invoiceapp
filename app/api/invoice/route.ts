@@ -2,6 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/prisma";
 import { getInvoiceTemplate } from "@/lib/utils";
 import { invoiceFormSchema } from "@/lib/validators/validators";
+import { Invoice } from "@prisma/client";
 import chromium from "@sparticuz/chromium";
 import { z } from "zod";
 
@@ -109,6 +110,43 @@ export async function POST(req: Request) {
     return new Response("There was an error while creating invoice", {
       status: 500,
     });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const session = await getAuthSession();
+    if (!session?.user) return new Response("Unauthorized", { status: 401 });
+
+    const body: Invoice = await req.json();
+    const { id } = body;
+
+    const invoice = await db.invoice.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!invoice) return new Response("Invoice was not found", { status: 404 });
+
+    await db.invoice.update({
+      where: {
+        id,
+      },
+      data: {
+        ...(({ id: _, ...rest }) => rest)(invoice),
+        ...(({ id: _, ...rest }) => rest)(body),
+      },
+    });
+
+    return new Response("Invoice has been updated", { status: 200 });
+  } catch (error) {
+    if (error) {
+      console.log(error);
+      return new Response("There was an error while updating invoice.", {
+        status: 500,
+      });
+    }
   }
 }
 

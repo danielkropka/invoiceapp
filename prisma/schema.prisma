@@ -39,9 +39,10 @@ type Product {
 }
 
 type Notification {
-  type      NotificationType
-  invoiceId String?
-  read      Boolean          @default(false)
+  type             NotificationType
+  invoiceId        String?
+  invoiceNumericId String?
+  read             Boolean          @default(false)
 
   createdAt DateTime @default(now())
 }

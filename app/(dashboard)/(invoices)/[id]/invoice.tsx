@@ -19,7 +19,7 @@ export default function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
 
   const handleSentEmail = async () => {
     startTransition(async () => {
-      sentEmail({
+      await sentEmail({
         token: invoice.token,
         email: invoice.client.email,
         invoiceDetails: {
@@ -43,20 +43,22 @@ export default function Invoice({ invoice }: { invoice: ExtendedInvoice }) {
           <Download className="w-5 h-5" />
           Pobierz fakturę
         </Button>
-        <Button
-          className="flex flex-1 items-center gap-1"
-          variant={"outline"}
-          onClick={handleSentEmail}
-          isLoading={isSending}
-          disabled={invoice.status === "PENDING" || isSending}
-        >
-          <Send className="w-5 h-5" />
-          {isSending
-            ? "Trwa wysyłanie e-mail'a"
-            : invoice.status === "PENDING"
-            ? "E-mail został już wysłany"
-            : "Wyślij na e-mail klienta"}
-        </Button>
+        {invoice.status !== "PAID" && (
+          <Button
+            className="flex flex-1 items-center gap-1"
+            variant={"outline"}
+            onClick={handleSentEmail}
+            isLoading={isSending}
+            disabled={invoice.status === "PENDING" || isSending}
+          >
+            <Send className="w-5 h-5" />
+            {isSending
+              ? "Trwa wysyłanie e-mail'a"
+              : invoice.status === "PENDING"
+              ? "E-mail został już wysłany"
+              : "Wyślij na e-mail klienta"}
+          </Button>
+        )}
       </div>
     </InvoiceTemplate>
   );
