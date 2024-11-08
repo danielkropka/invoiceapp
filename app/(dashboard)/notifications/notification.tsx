@@ -7,6 +7,7 @@ import moment from "moment";
 import "moment/locale/pl";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 export default function Notification({
   notification,
@@ -14,7 +15,8 @@ export default function Notification({
   notification: NotifyType;
 }) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isChangingRead, startChanging] = useTransition();
+  const [isChangingStatus, startChangingStatus] = useTransition();
 
   return (
     <div className="border p-4 rounded">
@@ -28,7 +30,7 @@ export default function Notification({
             )}
             <span className="flex justify-between items-center w-full">
               <span className="text-sm text-muted-foreground">
-                Faktura nr {notification.invoiceId}
+                Faktura nr {notification.invoiceNumericId}
               </span>
               <span className="text-sm text-muted-foreground">
                 {moment(notification.createdAt).fromNow()}
@@ -39,7 +41,30 @@ export default function Notification({
             <span>
               Klient/ka potwierdził/a opłacenie faktury, aby zmienić status
               faktury na opłaconą&nbsp;
-              <span className="underline underline-offset-2 hover:cursor-pointer text-sky-500">
+              <span
+                className="underline underline-offset-2 hover:cursor-pointer text-sky-500"
+                onClick={() => {
+                  startChangingStatus(async () => {
+                    try {
+                      if (isChangingStatus) return;
+                      await axios.patch("/api/invoice", {
+                        id: notification.invoiceId,
+                        status: "PAID",
+                      });
+
+                      toast.success(
+                        `Status faktury nr ${notification.invoiceNumericId} został zmieniony na Zapłacono.`
+                      );
+                    } catch (error) {
+                      if (error) {
+                        toast.error(
+                          "Wystąpił błąd podczas zmiany statusu faktury, spróbuj ponownie później."
+                        );
+                      }
+                    }
+                  });
+                }}
+              >
                 kliknij tutaj
               </span>
               .
@@ -47,7 +72,7 @@ export default function Notification({
             <Button
               size={"sm"}
               onClick={() => {
-                startTransition(async () => {
+                startChanging(async () => {
                   try {
                     await axios.patch("/api/notification", {
                       read: !notification.read,
@@ -60,7 +85,7 @@ export default function Notification({
                   }
                 });
               }}
-              isLoading={isPending}
+              isLoading={isChangingRead}
             >
               {notification.read
                 ? "Oznacz jako nieprzeczytane"

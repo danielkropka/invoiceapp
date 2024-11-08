@@ -1,11 +1,11 @@
 import { SendEmailToClientType } from "@/types/db";
 import axios, { AxiosError } from "axios";
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useCallback, useContext } from "react";
 import { toast } from "sonner";
 
 const defaultContext = {
   downloadPDF: (file: string, fileName: string) => {},
-  sentEmail: (data: SendEmailToClientType) => {},
+  sentEmail: async (data: SendEmailToClientType) => {},
 };
 
 export const InvoiceContext = createContext(defaultContext);
@@ -35,7 +35,7 @@ export const InvoiceContextProvider = ({
     }
   };
 
-  const sentEmail = async (data: SendEmailToClientType) => {
+  const sentEmail = useCallback(async (data: SendEmailToClientType) => {
     try {
       const { email, attachment, clientName, token, invoiceDetails } = data;
       await axios.post("/api/invoice/send", {
@@ -46,15 +46,19 @@ export const InvoiceContextProvider = ({
         attachment,
       });
 
-      return toast.success("Pomyślnie wysłano e-mail'a do klienta.");
+      toast.success("Pomyślnie wysłano e-mail'a do klienta.");
+      return;
     } catch (err) {
       if (err instanceof AxiosError)
-        if (err.status === 409) return toast.info("E-mail został już wysłany.");
-      return toast.error(
+        if (err.status === 409) {
+          toast.info("E-mail został już wysłany.");
+          return;
+        }
+      toast.error(
         "Wystąpił błąd podczas wysyłania e-mail'a. Spróbuj ponownie później."
       );
     }
-  };
+  }, []);
 
   return (
     <InvoiceContext.Provider

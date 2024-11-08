@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const body: { token: string } = await req.json();
 
     const invoiceToConfirm = await db.invoice.findFirst({
-      select: { creatorId: true, invoiceId: true },
+      select: { creatorId: true, invoiceId: true, id: true },
       where: {
         token: body.token,
       },
@@ -41,7 +41,8 @@ export async function POST(req: Request) {
         notifications: [
           ...invoiceCreator.notifications,
           {
-            invoiceId: invoiceToConfirm.invoiceId,
+            invoiceId: invoiceToConfirm.id,
+            invoiceNumericId: invoiceToConfirm.invoiceId,
             type: "CONFIRM_INVOICE",
             read: false,
             createdAt: new Date(),
