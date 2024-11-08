@@ -134,14 +134,8 @@ export async function PATCH(req: Request) {
         id,
       },
       data: {
-        ...((invoice) => {
-          const { id: _, ...rest } = invoice;
-          return rest;
-        })(invoice),
-        ...((body) => {
-          const { id: _, ...rest } = body;
-          return rest;
-        })(body),
+        ...(({ id: _, ...rest }) => rest)(invoice),
+        ...(({ id: _, ...rest }) => rest)(body),
       },
     });
 
