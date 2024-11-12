@@ -2,6 +2,8 @@ import { getServerSession, NextAuthOptions } from "next-auth";
 import { db } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -15,6 +17,32 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "E-mail", type: "text" },
+        password: { label: "Hasło", type: "password" },
+      },
+      async authorize(credentials) {
+        const user = await db.user.findUnique({
+          where: {
+            email: credentials?.email,
+          },
+        });
+
+        if (!user) throw new Error("User not found");
+        if (!user.password) throw new Error("User has no password.");
+
+        const validPassword = await bcrypt.compare(
+          credentials!.password,
+          user.password
+        );
+
+        if (!validPassword) throw new Error("Incorrect password");
+
+        return user;
+      },
     }),
   ],
   callbacks: {

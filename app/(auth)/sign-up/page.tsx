@@ -6,7 +6,7 @@ import { GoogleIcon } from "@/components/icons";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { loginFormSchema } from "@/lib/validators/validators";
+import { registerFormSchema } from "@/lib/validators/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -18,11 +18,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 
 export default function Page() {
-  const form = useForm<z.infer<typeof loginFormSchema>>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<z.infer<typeof registerFormSchema>>({
+    resolver: zodResolver(registerFormSchema),
   });
 
   const [isPending, startTransition] = useTransition();
@@ -35,17 +36,18 @@ export default function Page() {
     }
   };
 
-  const onSubmit = (data: z.infer<typeof loginFormSchema>) => {
+  const onSubmit = (data: z.infer<typeof registerFormSchema>) => {
     startTransition(async () => {
       try {
-        await signIn("credentials", {
-          email: data.email,
-          password: data.password,
-          callbackUrl: "/",
-        });
+        await axios.post("/api/auth/create", data);
 
-        toast.success("Pomyślnie zalogowano.");
+        toast.success("Pomyślnie stworzono konto.");
+        signIn("credentials", { email: data.email, password: data.password });
       } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.status === 302)
+            toast.error("Konto o tym e-mailu istnieje.");
+        }
         console.log(error);
       }
     });
@@ -54,7 +56,9 @@ export default function Page() {
   return (
     <main className="flex justify-center items-center h-screen bg-gradient-to-br from-slate-200">
       <div className="mx-auto max-w-md w-full border rounded my-4 p-6 h-fit bg-muted/40 shadow-xl space-y-4">
-        <h2 className="text-center text-3xl font-semibold">Witaj ponownie!</h2>
+        <h2 className="text-center text-3xl font-semibold">
+          Witaj w fakturly!
+        </h2>
         <Form {...form}>
           <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -70,44 +74,54 @@ export default function Page() {
                 </FormItem>
               )}
             />
-            <div className="space-y-1">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Hasło</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••••"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* TODO <div className="text-right">
-                <span className="text-sm text-muted-foreground hover:underline hover:cursor-pointer">
-                  Zapomniałeś hasła?
-                </span>
-              </div> */}
-            </div>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hasło</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••••"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="repeatPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Powtórz hasło</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••••"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <Button type="submit" className="w-full" isLoading={isPending}>
-              Zaloguj się
+              Rozpocznij fakturowanie
             </Button>
           </form>
         </Form>
         <div>
           <span className="text-sm text-muted-foreground">
-            Nie masz konta?{" "}
+            Masz już konto?{" "}
             <Link
               href={"/sign-up"}
               className="text-blue-500 hover:underline hover:cursor-pointer"
             >
-              Stwórz konto
+              Zaloguj się
             </Link>
           </span>
         </div>
