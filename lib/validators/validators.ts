@@ -1,6 +1,22 @@
 import { z } from "zod";
 import validator from "validator";
 
+export const loginFormSchema = z.object({
+  email: z.string({ required_error: "E-mail jest wymagany." }).email(),
+  password: z.string({ required_error: "Hasło jest wymagane." }).min(4),
+});
+
+export const registerFormSchema = z
+  .object({
+    email: z.string({ required_error: "E-mail jest wymagany." }).email(),
+    password: z.string({ required_error: "Hasło jest wymagane." }).min(4),
+    repeatPassword: z.string({ required_error: "Hasło jest wymagane." }).min(4),
+  })
+  .refine((data) => data.password === data.repeatPassword, {
+    message: "Hasła się różnią.",
+    path: ["repeatPassword"],
+  });
+
 export const clientFormSchema = z.object({
   name: z.string(),
   email: z.string().email(),
