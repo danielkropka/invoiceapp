@@ -20,6 +20,7 @@ export async function POST(req: Request) {
     const invoiceExist = await db.invoice.findFirst({
       where: {
         invoiceId,
+        creatorId: session.user.id,
       },
     });
 
