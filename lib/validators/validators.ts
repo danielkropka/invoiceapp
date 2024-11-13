@@ -8,6 +8,7 @@ export const loginFormSchema = z.object({
 
 export const registerFormSchema = z
   .object({
+    name: z.string().min(3),
     email: z.string({ required_error: "E-mail jest wymagany." }).email(),
     password: z.string({ required_error: "Hasło jest wymagane." }).min(4),
     repeatPassword: z.string({ required_error: "Hasło jest wymagane." }).min(4),

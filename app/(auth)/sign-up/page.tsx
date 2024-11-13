@@ -82,6 +82,19 @@ export default function Page() {
             />
             <FormField
               control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Imię i nazwisko / nazwa firmy</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Fakturly" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
