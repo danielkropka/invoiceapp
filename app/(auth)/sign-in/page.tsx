@@ -31,6 +31,9 @@ export default function Page() {
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
+      toast.error(
+        "Wystąpił błąd w trakcie logowania z pomocą konta Google. Spróbuj innej metody logowania."
+      );
       console.log(error);
     }
   };
@@ -38,11 +41,27 @@ export default function Page() {
   const onSubmit = (data: z.infer<typeof loginFormSchema>) => {
     startTransition(async () => {
       try {
-        await signIn("credentials", {
+        const result = await signIn("credentials", {
           email: data.email,
           password: data.password,
+          redirect: false,
           callbackUrl: "/",
         });
+
+        if (result?.error) {
+          if (result.error === "User not found")
+            form.setError("email", {
+              message: "Nieznaleziono konta o podanym e-mailu.",
+            });
+          else if (result.error === "User has no password")
+            form.setError("email", {
+              message: "Konto nie posiada przypisanego hasła",
+            });
+          else if (result.error === "Incorrect password")
+            form.setError("password", { message: "Niepoprawne hasło" });
+
+          throw new Error(result.error);
+        }
 
         toast.success("Pomyślnie zalogowano.");
       } catch (error) {
@@ -52,8 +71,8 @@ export default function Page() {
   };
 
   return (
-    <main className="flex justify-center items-center h-screen bg-gradient-to-br from-slate-200">
-      <div className="mx-auto max-w-md w-full border rounded my-4 p-6 h-fit bg-muted/40 shadow-xl space-y-4">
+    <main className="flex justify-center items-center h-screen">
+      <div className="md:mx-auto max-w-md w-full border rounded my-4 mx-3 p-6 h-fit bg-muted/40 shadow-xl space-y-4">
         <h2 className="text-center text-3xl font-semibold">Witaj ponownie!</h2>
         <Form {...form}>
           <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -112,11 +131,11 @@ export default function Page() {
           </span>
         </div>
         <div className="relative flex items-center my-4">
-          <span className="flex-grow border-muted-foreground border-t-2 border-dotted"></span>
+          <span className="flex-grow border-muted-foreground border-t"></span>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="px-2 text-muted-foreground">lub</span>
           </div>
-          <span className="flex-grow border-muted-foreground border-t-2 border-dotted"></span>
+          <span className="flex-grow border-muted-foreground border-t"></span>
         </div>
         <Button
           className="w-full"
