@@ -10,7 +10,7 @@ export default async function Page() {
   return (
     <main className="space-y-4 divide-y">
       <h2 className="text-2xl font-semibold pb-4">Ustawienia</h2>
-      <div className="flex gap-10 py-6">
+      <div className="flex flex-col md:flex-row gap-10 py-6">
         <div className="flex flex-col">
           <span className="font-semibold">Dane rozliczeniowe</span>
           <span className="text-muted-foreground text-sm">
