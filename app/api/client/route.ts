@@ -15,6 +15,7 @@ export async function POST(req: Request) {
     const clientExist = await db.client.findFirst({
       where: {
         email,
+        creatorId: session.user.id,
       },
     });
 
