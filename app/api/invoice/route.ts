@@ -14,6 +14,7 @@ export async function POST(req: Request) {
     if (!session?.user) return new Response("Unauthorized", { status: 401 });
 
     const body = await req.json();
+
     const { invoiceId, issuedAt, soldAt, products, clientId, exemptTax } =
       invoiceFormSchema.parse(body);
 
@@ -108,6 +109,7 @@ export async function POST(req: Request) {
     if (error instanceof z.ZodError) {
       return new Response(error.message, { status: 422 });
     }
+    console.log(error);
 
     return new Response("There was an error while creating invoice", {
       status: 500,

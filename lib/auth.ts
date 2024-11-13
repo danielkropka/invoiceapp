@@ -82,7 +82,9 @@ export const authOptions: NextAuthOptions = {
       };
     },
     redirect() {
-      return "/";
+      return process.env.NODE_ENV === "development"
+        ? "http://localhost:3000/"
+        : "https://www.fakturly.pl/";
     },
   },
 };

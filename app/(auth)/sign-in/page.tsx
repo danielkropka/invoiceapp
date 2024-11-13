@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const form = useForm<z.infer<typeof loginFormSchema>>({
@@ -26,6 +27,7 @@ export default function Page() {
   });
 
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const loginWithGoogle = async () => {
     try {
@@ -42,10 +44,9 @@ export default function Page() {
     startTransition(async () => {
       try {
         const result = await signIn("credentials", {
+          redirect: false,
           email: data.email,
           password: data.password,
-          redirect: false,
-          callbackUrl: "/",
         });
 
         if (result?.error) {
@@ -61,9 +62,10 @@ export default function Page() {
             form.setError("password", { message: "Niepoprawne hasło" });
 
           throw new Error(result.error);
+        } else if (result?.ok) {
+          router.push("/");
+          toast.success("Pomyślnie zalogowano.");
         }
-
-        toast.success("Pomyślnie zalogowano.");
       } catch (error) {
         console.log(error);
       }
