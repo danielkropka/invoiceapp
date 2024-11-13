@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { sumAllProducts } from "@/lib/utils";
+import { cn, sumAllProducts } from "@/lib/utils";
 
 function InvoiceTemplate({
   invoice,
@@ -85,7 +85,11 @@ function InvoiceTemplate({
               </span>
               {creatorTax ? (
                 <span>
-                  <span className="font-semibold">NIP:</span> {creatorTax}
+                  NIP{" "}
+                  {creatorTax.replace(
+                    /(\d{3})(\d{3})(\d{2})(\d{2})/,
+                    "$1-$2-$3-$4"
+                  )}
                 </span>
               ) : null}
             </div>
@@ -102,7 +106,11 @@ function InvoiceTemplate({
               </span>
               {clientTax ? (
                 <span>
-                  <span className="font-semibold">NIP:</span> {clientTax}
+                  NIP{" "}
+                  {clientTax.replace(
+                    /(\d{3})(\d{3})(\d{2})(\d{2})/,
+                    "$1-$2-$3-$4"
+                  )}
                 </span>
               ) : null}
             </div>
@@ -115,9 +123,13 @@ function InvoiceTemplate({
                     <TableHead>Opis</TableHead>
                     <TableHead>Cena netto</TableHead>
                     <TableHead>Ilość</TableHead>
-                    <TableHead>VAT</TableHead>
+                    <TableHead className={cn(invoice.exemptTax && "hidden")}>
+                      VAT
+                    </TableHead>
                     <TableHead>Wartość netto</TableHead>
-                    <TableHead>Kwota VAT</TableHead>
+                    <TableHead className={cn(invoice.exemptTax && "hidden")}>
+                      Kwota VAT
+                    </TableHead>
                     <TableHead>Wartość brutto</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -129,25 +141,33 @@ function InvoiceTemplate({
                         <TableCell>{product.description ?? "-"}</TableCell>
                         <TableCell>{product.price.toFixed(2)} zł</TableCell>
                         <TableCell>{product.quantity}</TableCell>
-                        <TableCell>{product.vat}%</TableCell>
+                        <TableCell
+                          className={cn(invoice.exemptTax && "hidden")}
+                        >
+                          {product.vat}%
+                        </TableCell>
                         <TableCell>
                           {(product.price * product.quantity).toFixed(2)} zł
                         </TableCell>
-                        <TableCell>
+                        <TableCell
+                          className={cn(invoice.exemptTax && "hidden")}
+                        >
                           {(
                             product.price *
                             (Number(product.vat) / 100) *
                             product.quantity
-                          ).toFixed(2)}{" "}
-                          zł
+                          ).toFixed(2)}
+                          &nbsp;zł
                         </TableCell>
                         <TableCell>
-                          {(
-                            product.price *
-                            (Number(product.vat) / 100 + 1) *
-                            product.quantity
-                          ).toFixed(2)}{" "}
-                          zł
+                          {invoice.exemptTax
+                            ? (product.price * product.quantity).toFixed(2)
+                            : (
+                                product.price *
+                                (Number(product.vat) / 100 + 1) *
+                                product.quantity
+                              ).toFixed(2)}
+                          &nbsp;zł
                         </TableCell>
                       </TableRow>
                     </React.Fragment>
@@ -155,9 +175,15 @@ function InvoiceTemplate({
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={7}>Łączna wartość brutto</TableCell>
+                    <TableCell colSpan={invoice.exemptTax ? 5 : 7}>
+                      Łączna wartość brutto
+                    </TableCell>
                     <TableCell>
-                      {sumAllProducts(invoice.products).toFixed(2)} zł
+                      {sumAllProducts(
+                        invoice.products,
+                        invoice.exemptTax!
+                      ).toFixed(2)}{" "}
+                      zł
                     </TableCell>
                   </TableRow>
                 </TableFooter>

@@ -26,6 +26,7 @@ import {
 import { SelectValue } from "@radix-ui/react-select";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 export default function Products({
   form,
@@ -53,7 +54,9 @@ export default function Products({
             <TableHead>Opis</TableHead>
             <TableHead>Cena netto</TableHead>
             <TableHead>Ilość</TableHead>
-            <TableHead>VAT</TableHead>
+            <TableHead className={cn(form.watch("exemptTax") && "hidden")}>
+              VAT
+            </TableHead>
             <TableHead className="w-3 rounded-r"></TableHead>
           </TableRow>
         </TableHeader>
@@ -132,7 +135,7 @@ export default function Products({
                   )}
                 />
               </TableCell>
-              <TableCell>
+              <TableCell className={cn(form.watch("exemptTax") && "hidden")}>
                 <FormField
                   name={`products.${index}.vat`}
                   render={({ field }) => (
@@ -150,6 +153,7 @@ export default function Products({
                           <SelectItem value="23">23%</SelectItem>
                           <SelectItem value="8">8%</SelectItem>
                           <SelectItem value="5">5%</SelectItem>
+                          <SelectItem value="0">0%</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

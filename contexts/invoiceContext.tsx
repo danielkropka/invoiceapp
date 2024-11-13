@@ -47,7 +47,6 @@ export const InvoiceContextProvider = ({
       });
 
       toast.success("Pomyślnie wysłano e-mail'a do klienta.");
-      return;
     } catch (err) {
       if (err instanceof AxiosError)
         if (err.status === 409) {

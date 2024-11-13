@@ -32,6 +32,9 @@ export default function Page() {
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
+      toast.error(
+        "Wystąpił błąd w trakcie tworzenia konta z pomocą Google. Spróbuj innej metody logowania."
+      );
       console.log(error);
     }
   };
@@ -46,16 +49,19 @@ export default function Page() {
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.status === 302)
-            toast.error("Konto o tym e-mailu istnieje.");
+            return form.setError("email", {
+              message: "Konto o podanym e-mailu już istnieje",
+            });
         }
+        toast.error("Wystąpił błąd w trakcie logowania.");
         console.log(error);
       }
     });
   };
 
   return (
-    <main className="flex justify-center items-center h-screen bg-gradient-to-br from-slate-200">
-      <div className="mx-auto max-w-md w-full border rounded my-4 p-6 h-fit bg-muted/40 shadow-xl space-y-4">
+    <main className="flex justify-center items-center h-screen">
+      <div className="md:mx-auto max-w-md w-full border rounded my-4 mx-3 p-6 h-fit bg-muted/40 shadow-xl space-y-4">
         <h2 className="text-center text-3xl font-semibold">
           Witaj w fakturly!
         </h2>
@@ -118,7 +124,7 @@ export default function Page() {
           <span className="text-sm text-muted-foreground">
             Masz już konto?{" "}
             <Link
-              href={"/sign-up"}
+              href={"/sign-in"}
               className="text-blue-500 hover:underline hover:cursor-pointer"
             >
               Zaloguj się
@@ -126,11 +132,11 @@ export default function Page() {
           </span>
         </div>
         <div className="relative flex items-center my-4">
-          <span className="flex-grow border-muted-foreground border-t-2 border-dotted"></span>
+          <span className="flex-grow border-muted-foreground border-t"></span>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="px-2 text-muted-foreground">lub</span>
           </div>
-          <span className="flex-grow border-muted-foreground border-t-2 border-dotted"></span>
+          <span className="flex-grow border-muted-foreground border-t"></span>
         </div>
         <Button
           className="w-full"

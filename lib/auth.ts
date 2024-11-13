@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user) throw new Error("User not found");
-        if (!user.password) throw new Error("User has no password.");
+        if (!user.password) throw new Error("User has no password");
 
         const validPassword = await bcrypt.compare(
           credentials!.password,
@@ -52,6 +52,8 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.name = token.name;
         session.user.image = token.picture;
+        session.user.address = token.address;
+        session.user.taxIdNumber = token.taxIdNumber;
         session.user.notifications = token.notifications;
       }
 
@@ -74,6 +76,8 @@ export const authOptions: NextAuthOptions = {
         name: dbUser.name,
         email: dbUser.email,
         picture: dbUser.image,
+        taxIdNumber: dbUser.taxIdNumber,
+        address: dbUser.address,
         notifications: dbUser.notifications,
       };
     },

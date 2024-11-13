@@ -29,18 +29,39 @@ export const clientFormSchema = z.object({
   taxIdNumber: z.string().optional(),
 });
 
-export const invoiceFormSchema = z.object({
-  invoiceId: z.string(),
-  issuedAt: z.coerce.date(),
-  soldAt: z.coerce.date(),
-  clientId: z.string(),
-  products: z
-    .object({
-      name: z.string(),
-      description: z.string().optional(),
-      price: z.coerce.number(),
-      quantity: z.coerce.number(),
-      vat: z.string(),
-    })
-    .array(),
+export const addressFormSchema = z.object({
+  street: z.string(),
+  postalCode: z.string().regex(/^\d{2}-\d{3}$/, {
+    message: "Kod pocztowy musi być w formacie 00-000",
+  }),
+  city: z.string(),
+  nip: z.string().max(10).min(10).optional(),
 });
+
+export const invoiceFormSchema = z
+  .object({
+    invoiceId: z.string(),
+    issuedAt: z.coerce.date(),
+    soldAt: z.coerce.date(),
+    exemptTax: z.boolean().default(false).optional(),
+    clientId: z.string(),
+    products: z
+      .object({
+        name: z.string(),
+        description: z.string().optional(),
+        price: z.coerce.number(),
+        quantity: z.coerce.number(),
+        vat: z.string().optional(),
+      })
+      .array(),
+  })
+  .refine(
+    (data) => {
+      if (!data.exemptTax) {
+        return data.products.every((product) => product.vat);
+      }
+
+      return true;
+    },
+    { message: "Pole VAT jest wymagane", path: ["products", "vat"] }
+  );

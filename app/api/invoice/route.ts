@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     if (!session?.user) return new Response("Unauthorized", { status: 401 });
 
     const body = await req.json();
-    const { invoiceId, issuedAt, soldAt, products, clientId } =
+    const { invoiceId, issuedAt, soldAt, products, clientId, exemptTax } =
       invoiceFormSchema.parse(body);
 
     const invoiceExist = await db.invoice.findFirst({
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
 
     const invoice = await db.invoice.create({
       data: {
+        exemptTax,
         invoiceId,
         issuedAt,
         soldAt,
