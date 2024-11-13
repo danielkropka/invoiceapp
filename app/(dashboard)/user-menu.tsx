@@ -38,7 +38,9 @@ function UserMenu({ user }: { user: User }) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Moje konto</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Ustawienia</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={"/settings"}>Ustawienia</Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         {user ? (
           <DropdownMenuItem>

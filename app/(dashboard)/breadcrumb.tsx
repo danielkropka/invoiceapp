@@ -24,6 +24,8 @@ export default function DashboardBreadCrumb() {
         return "Klienci";
       case "create":
         return "Kreator";
+      case "settings":
+        return "Ustawienia";
       default:
         break;
     }
