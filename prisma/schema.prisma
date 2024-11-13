@@ -112,7 +112,7 @@ model Client {
 model Invoice {
   id            String   @id @default(cuid()) @map("_id")
   token         String   @default(cuid())
-  invoiceId     String   @unique
+  invoiceId     String
   status        Status?
   paymentMethod Method?
   exemptTax     Boolean? @default(false)
