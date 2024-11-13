@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
         notifications: dbUser.notifications,
       };
     },
-    redirect({ baseUrl, url }) {
+    redirect() {
       return process.env.NODE_ENV === "development"
         ? "http://localhost:3000/"
         : "https://www.fakturly.pl/";

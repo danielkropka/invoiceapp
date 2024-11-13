@@ -29,8 +29,6 @@ export async function POST(req: Request) {
       return new Response("Invoice with same invoiceId already exists", {
         status: 400,
       });
-    console.log("dziala2");
-    console.log(exemptTax);
 
     const invoice = await db.invoice.create({
       data: {
