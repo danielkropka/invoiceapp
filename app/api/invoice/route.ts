@@ -32,6 +32,7 @@ export async function POST(req: Request) {
 
     const invoice = await db.invoice.create({
       data: {
+        exemptTax,
         invoiceId,
         issuedAt,
         soldAt,
