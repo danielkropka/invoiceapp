@@ -18,10 +18,15 @@ export const getInvoiceTemplate = async () => {
   }
 };
 
-export const sumAllProducts = (products: Product[]) => {
+export const sumAllProducts = (
+  products: Product[],
+  exemptTax: boolean = false
+) => {
   let sum = 0;
   products.forEach((product) => {
-    sum += product.price * product.quantity * (1 + Number(product.vat) / 100);
+    sum += exemptTax
+      ? product.price * product.quantity
+      : product.price * product.quantity * (1 + Number(product.vat) / 100);
   });
 
   return sum;

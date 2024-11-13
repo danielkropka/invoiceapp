@@ -35,7 +35,7 @@ type Product {
   description String?
   price       Float
   quantity    Int
-  vat         String
+  vat         String?
 }
 
 type Notification {
@@ -110,11 +110,12 @@ model Client {
 }
 
 model Invoice {
-  id            String  @id @default(cuid()) @map("_id")
-  token         String  @default(cuid())
-  invoiceId     String  @unique
+  id            String   @id @default(cuid()) @map("_id")
+  token         String   @default(cuid())
+  invoiceId     String   @unique
   status        Status?
   paymentMethod Method?
+  exemptTax     Boolean? @default(false)
 
   issuedAt  DateTime  @default(now())
   soldAt    DateTime  @default(now())

@@ -34,6 +34,7 @@ import "moment/locale/pl";
 import ClientSelection from "./client-selection";
 import { Client } from "@prisma/client";
 import InvoicePreview from "./invoicePreview";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export type invoiceType = z.infer<typeof invoiceFormSchema> & {
   client: Client;
@@ -60,6 +61,7 @@ function InvoiceCreatorForm({
 
   const { mutate: saveInvoice, isPending } = useMutation({
     mutationFn: async ({
+      exemptTax,
       invoiceId,
       issuedAt,
       soldAt,
@@ -67,6 +69,7 @@ function InvoiceCreatorForm({
       clientId,
     }: invoiceType) => {
       return await axios.post("/api/invoice", {
+        exemptTax,
         invoiceId,
         issuedAt,
         soldAt,
@@ -212,6 +215,26 @@ function InvoiceCreatorForm({
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span className="text-2xl font-semibold col-span-full">
+                  Szczegóły
+                </span>
+                <FormField
+                  control={form.control}
+                  name="exemptTax"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>podatnik zwolniony z VAT</FormLabel>
+                      </div>
                     </FormItem>
                   )}
                 />
