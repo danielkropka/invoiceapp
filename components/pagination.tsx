@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 
 export default function Pagination({
@@ -14,49 +14,88 @@ export default function Pagination({
   total: number;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const rowsPerPage = 5;
   const [isPending, startTransition] = useTransition();
 
-  const prevPage = () => {
-    router.back();
-  };
+  // Konwertuj offset na liczbę jeśli jest stringiem
+  const currentOffset = typeof offset === "string" ? parseInt(offset) : offset;
 
-  const nextPage = () => {
+  const currentPage = currentOffset
+    ? Math.floor(currentOffset / rowsPerPage) + 1
+    : 1;
+  const totalPages = Math.ceil(total / rowsPerPage);
+
+  const prevPage = () => {
+    const newOffset = Math.max(0, (currentOffset || 0) - rowsPerPage);
+    const params = new URLSearchParams(searchParams);
+    if (newOffset === 0) {
+      params.delete("offset");
+    } else {
+      params.set("offset", newOffset.toString());
+    }
     startTransition(() => {
-      router.push(`?offset=${offset}`, { scroll: false });
+      router.push(`?${params.toString()}`, { scroll: false });
     });
   };
 
+  const nextPage = () => {
+    const newOffset = (currentOffset || 0) + rowsPerPage;
+    const params = new URLSearchParams(searchParams);
+    params.set("offset", newOffset.toString());
+    startTransition(() => {
+      router.push(`?${params.toString()}`, { scroll: false });
+    });
+  };
+
+  // Pokaż paginację tylko jeśli są więcej niż 5 elementów
+  if (total <= rowsPerPage) return null;
+
   return (
-    <CardFooter>
-      {offset && offset !== 0 ? (
-        <div className="flex w-full justify-between md:justify-normal">
+    <CardFooter className="border-t bg-muted/30 px-6 py-4">
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>
+            Strona {currentPage} z {totalPages}
+          </span>
+          <span className="hidden sm:inline">•</span>
+          <span className="hidden sm:inline">{total} faktur</span>
+        </div>
+
+        <div className="flex items-center gap-2">
           <Button
             onClick={prevPage}
-            variant="ghost"
+            variant="outline"
             size="sm"
-            type="submit"
-            disabled={offset === rowsPerPage}
+            disabled={currentPage <= 1}
+            className="gap-2 hover:bg-background transition-colors duration-200"
           >
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Poprzednia
+            <ChevronLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Poprzednia</span>
           </Button>
+
+          <div className="flex items-center gap-1 px-3 py-1 bg-background rounded-md border">
+            <span className="text-sm font-medium">{currentPage}</span>
+            <span className="text-muted-foreground">/</span>
+            <span className="text-sm text-muted-foreground">{totalPages}</span>
+          </div>
+
           <Button
             onClick={nextPage}
-            variant="ghost"
+            variant="outline"
             size="sm"
-            type="submit"
-            disabled={offset >= total}
+            disabled={currentPage >= totalPages}
+            className="gap-2 hover:bg-background transition-colors duration-200"
           >
-            Następna
+            <span className="hidden sm:inline">Następna</span>
             {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin ml-2" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <ChevronRight className="ml-2 h-4 w-4" />
+              <ChevronRight className="h-4 w-4" />
             )}
           </Button>
         </div>
-      ) : null}
+      </div>
     </CardFooter>
   );
 }

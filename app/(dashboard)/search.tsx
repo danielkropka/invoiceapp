@@ -33,7 +33,11 @@ export function SearchInput() {
         <Input
           name="q"
           type="search"
-          placeholder="Wyszukaj po e-mail klienta..."
+          placeholder={
+            pathname === "/clients"
+              ? "Wyszukaj klienta..."
+              : "Wyszukaj fakturę..."
+          }
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
         />
       </div>

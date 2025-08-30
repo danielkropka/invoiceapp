@@ -6,13 +6,15 @@ import { CardContent } from "@/components/ui/card";
 export default async function ClientsCardContent({
   searchParams,
 }: {
-  searchParams: { q: string; offset: string };
+  searchParams: { q?: string; offset?: string };
 }) {
   const search = searchParams.q ?? "";
-  const offset = searchParams.offset ?? 0;
+  const offsetParam = searchParams.offset;
+  const offset =
+    offsetParam && !isNaN(Number(offsetParam)) ? Number(offsetParam) : 0;
   const { clients, newOffset, totalClients } = await getClients(
     search,
-    Number(offset),
+    offset,
     false
   );
 
@@ -25,7 +27,9 @@ export default async function ClientsCardContent({
           <ClientsTable clients={clients} />
         )}
       </CardContent>
-      <Pagination offset={newOffset} total={totalClients} />
+      {clients.length > 0 && (
+        <Pagination offset={offset} total={totalClients} />
+      )}
     </>
   );
 }

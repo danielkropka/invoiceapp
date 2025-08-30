@@ -67,7 +67,10 @@ export async function getInvoices(
     skip: offset,
     take: 5,
   });
-  const newOffset = offset + moreInvoices.length;
+
+  // Sprawdź czy są więcej stron
+  const hasMorePages = offset + moreInvoices.length < totalInvoices;
+  const newOffset = hasMorePages ? offset + moreInvoices.length : null;
 
   return {
     invoices: moreInvoices,
@@ -76,22 +79,30 @@ export async function getInvoices(
   };
 }
 
-export async function getPreferredInvoiceId(): Promise<{ id: number | null }> {
+export async function generateUniqueInvoiceId(): Promise<{
+  id: string | null;
+}> {
   const session = await getAuthSession();
   if (!session?.user) return { id: null };
+
   const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+
   const invoicesThisMonth = await db.invoice.count({
     where: {
       creatorId: session.user.id,
       createdAt: {
-        gt: new Date(
-          `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-1`
-        ),
+        gte: new Date(year, currentDate.getMonth(), 1),
+        lt: new Date(year, currentDate.getMonth() + 1, 1),
       },
     },
   });
 
-  return { id: invoicesThisMonth + 1 };
+  const sequentialNumber = String(invoicesThisMonth + 1).padStart(3, "0");
+  const uniqueId = `${year}-${month}-${sequentialNumber}`;
+
+  return { id: uniqueId };
 }
 
 export async function getClients(
@@ -159,7 +170,9 @@ export async function getClients(
       take: 5,
     });
 
-    const newOffset = offset + moreClients.length;
+    // Sprawdź czy są więcej stron
+    const hasMorePages = offset + moreClients.length < totalClients;
+    const newOffset = hasMorePages ? offset + moreClients.length : null;
 
     return {
       clients: moreClients,

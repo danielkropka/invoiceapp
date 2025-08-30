@@ -16,7 +16,7 @@ import ClientsCardContent from "./clientsCardContent";
 export default async function Clients({
   searchParams,
 }: {
-  searchParams: { q: string; offset: string };
+  searchParams: { q?: string; offset?: string };
 }) {
   return (
     <>
