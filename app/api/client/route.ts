@@ -53,17 +53,6 @@ export async function DELETE(req: Request) {
     const body = await req.json();
     const { id }: { id: string } = body;
 
-    /* Check if client exists */
-    const clientExists = await db.client.findFirst({
-      where: {
-        id,
-        creatorId: session.user.id,
-      },
-    });
-
-    if (!clientExists)
-      return new Response("Client was not found.", { status: 404 });
-
     await db.client.delete({
       where: {
         id,

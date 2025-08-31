@@ -162,17 +162,6 @@ export async function DELETE(req: Request) {
     const body = await req.json();
     const { id }: { id: string } = body;
 
-    /* Check if invoice exists */
-    const invoiceExists = await db.invoice.findFirst({
-      where: {
-        id,
-        creatorId: session.user.id,
-      },
-    });
-
-    if (!invoiceExists)
-      return new Response("Invoice was not found.", { status: 404 });
-
     await db.invoice.delete({
       where: {
         id,
