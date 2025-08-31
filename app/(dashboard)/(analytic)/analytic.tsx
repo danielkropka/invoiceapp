@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, TrendingUp } from "lucide-react";
 import { clsx } from "clsx";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +7,8 @@ function Analytic({
   className,
   title,
   data,
+  icon: Icon = TrendingUp,
+  color = "blue",
 }: {
   className?: React.ReactNode;
   title: string;
@@ -15,48 +17,89 @@ function Analytic({
     percent: number;
     isHigher: boolean;
   };
+  icon?: React.ComponentType<{ className?: string }>;
+  color?: string;
 }) {
+  const colorClasses = {
+    blue: {
+      bg: "bg-blue-100 dark:bg-blue-900/50",
+      text: "text-blue-600 dark:text-blue-400",
+      iconBg: "bg-blue-50 dark:bg-blue-950/50",
+    },
+    green: {
+      bg: "bg-green-100 dark:bg-green-900/50",
+      text: "text-green-600 dark:text-green-400",
+      iconBg: "bg-green-50 dark:bg-green-950/50",
+    },
+    purple: {
+      bg: "bg-purple-100 dark:bg-purple-900/50",
+      text: "text-purple-600 dark:text-purple-400",
+      iconBg: "bg-purple-50 dark:bg-purple-950/50",
+    },
+  };
+
+  const currentColor =
+    colorClasses[color as keyof typeof colorClasses] || colorClasses.blue;
+
   return (
-    <div className={cn("p-4 flex flex-col min-h-32", className)}>
-      <h1 className="font-semibold text-lg">{title}</h1>
-      <div className="flex flex-col justify-end h-full gap-2">
-        <span className="font-semibold text-xl flex items-center gap-3">
-          {data.value}
-          <div className="flex items-center gap-1">
-            <span
+    <div className={cn("flex flex-col min-h-32", className)}>
+      <div className="flex items-center gap-3 mb-4">
+        <div className={cn("p-2 rounded-lg", currentColor.iconBg)}>
+          <Icon className={cn("w-5 h-5", currentColor.text)} />
+        </div>
+        <h3 className="font-semibold text-lg text-foreground">{title}</h3>
+      </div>
+
+      <div className="flex flex-col justify-end h-full gap-3">
+        <div className="flex items-center justify-between">
+          <span className={cn("font-bold text-2xl", currentColor.text)}>
+            {data.value}
+          </span>
+          <div className="flex items-center gap-2">
+            <div
               className={clsx(
-                "rounded-full w-5 h-5 flex items-center justify-center",
+                "rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200",
                 {
-                  "bg-green-200 dark:bg-[#0C642C]": data.isHigher,
-                  "bg-red-200 dark:bg-red-600": !data.isHigher,
+                  "bg-green-100 dark:bg-green-900/50": data.isHigher,
+                  "bg-red-100 dark:bg-red-900/50": !data.isHigher,
                 }
               )}
             >
               {data.isHigher ? (
                 <ArrowUp
-                  strokeWidth={3}
-                  className="w-4 h-4 text-[#0C642C] dark:text-green-200"
+                  strokeWidth={2.5}
+                  className="w-4 h-4 text-green-600 dark:text-green-400"
                 />
               ) : (
                 <ArrowDown
-                  strokeWidth={3}
-                  className="w-4 h-4 text-red-600 dark:text-red-200"
+                  strokeWidth={2.5}
+                  className="w-4 h-4 text-red-600 dark:text-red-400"
                 />
               )}
-            </span>
+            </div>
             <span
-              className={clsx("text-base", {
-                "text-red-600": !data.isHigher,
-                "text-[#0C642C]": data.isHigher,
+              className={clsx("text-sm font-medium", {
+                "text-red-600 dark:text-red-400": !data.isHigher,
+                "text-green-600 dark:text-green-400": data.isHigher,
               })}
             >
               {Math.abs(data.percent).toFixed(0)}%
             </span>
           </div>
-        </span>
-        <span className="text-sm text-muted-foreground">
-          W porównaniu do poprzedniego miesiąca.
-        </span>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div
+            className={cn("w-2 h-2 rounded-full", {
+              "bg-green-500": data.isHigher,
+              "bg-red-500": !data.isHigher,
+            })}
+          />
+          <span>
+            {data.isHigher ? "Wzrost" : "Spadek"} w porównaniu do poprzedniego
+            miesiąca
+          </span>
+        </div>
       </div>
     </div>
   );

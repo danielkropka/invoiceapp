@@ -41,7 +41,7 @@ export const addressFormSchema = z.object({
 
 export const invoiceFormSchema = z
   .object({
-    invoiceId: z.string(),
+    invoiceId: z.string().optional(),
     issuedAt: z.coerce.date(),
     soldAt: z.coerce.date(),
     exemptTax: z.boolean().default(false).optional(),
