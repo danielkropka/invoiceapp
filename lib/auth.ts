@@ -43,6 +43,17 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 dni
     updateAge: 24 * 60 * 60, // 24 godziny
   },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   pages: {
     signIn: "/sign-in",
     error: "/sign-in", // Przekieruj błędy na stronę logowania
@@ -151,6 +162,15 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
+      // Debug logi
+      if (process.env.NODE_ENV === "production") {
+        console.log("JWT callback:", {
+          hasUser: !!user,
+          hasToken: !!token,
+          tokenEmail: token?.email,
+        });
+      }
+
       // Przy pierwszym logowaniu
       if (user) {
         token.id = user.id;

@@ -34,6 +34,11 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname;
 
+        // Debug logi dla produkcji
+        if (process.env.NODE_ENV === "production") {
+          console.log(`Middleware: ${pathname}, token: ${!!token}`);
+        }
+
         // Publiczne ścieżki
         if (
           pathname.startsWith("/sign-in") ||
@@ -41,13 +46,20 @@ export default withAuth(
           pathname.startsWith("/api/auth") ||
           pathname.startsWith("/_next") ||
           pathname.startsWith("/favicon.ico") ||
+          pathname.startsWith("/confirm-invoice") ||
           pathname === "/"
         ) {
           return true;
         }
 
         // Wymagaj autoryzacji dla wszystkich innych ścieżek
-        return !!token;
+        const isAuthorized = !!token;
+
+        if (!isAuthorized && process.env.NODE_ENV === "production") {
+          console.log(`Unauthorized access to: ${pathname}`);
+        }
+
+        return isAuthorized;
       },
     },
   }
