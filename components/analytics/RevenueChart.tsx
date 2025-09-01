@@ -44,26 +44,19 @@ export default function RevenueChart({
     invoices.forEach((invoice) => {
       const date = new Date(invoice.issuedAt);
       let periodKey: string;
-      let periodName: string;
 
       switch (period) {
         case "quarter":
           const quarter = Math.floor(date.getMonth() / 3) + 1;
           periodKey = `${date.getFullYear()}-Q${quarter}`;
-          periodName = `Q${quarter} ${date.getFullYear()}`;
           break;
         case "year":
           periodKey = `${date.getFullYear()}`;
-          periodName = `${date.getFullYear()}`;
           break;
         default: // month
           periodKey = `${date.getFullYear()}-${String(
             date.getMonth() + 1
           ).padStart(2, "0")}`;
-          periodName = date.toLocaleDateString("pl-PL", {
-            month: "short",
-            year: "numeric",
-          });
       }
 
       const total = invoice.products.reduce((sum, product) => {

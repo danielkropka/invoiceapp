@@ -19,4 +19,8 @@ declare module "next-auth" {
       taxIdNumber: string?;
     };
   }
+
+  interface Profile {
+    email_verified?: boolean;
+  }
 }

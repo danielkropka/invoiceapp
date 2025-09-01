@@ -150,7 +150,7 @@ export const authOptions: NextAuthOptions = {
 
       return session;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       // Przy pierwszym logowaniu
       if (user) {
         token.id = user.id;
@@ -194,7 +194,7 @@ export const authOptions: NextAuthOptions = {
         ? "http://localhost:3000/"
         : "https://www.fakturly.pl/";
     },
-    async signIn({ user, account, profile }) {
+    async signIn({ account, profile }) {
       // Dodatkowa walidacja dla Google OAuth
       if (account?.provider === "google") {
         // Sprawdź czy email jest zweryfikowany
@@ -207,7 +207,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   events: {
-    async signIn({ user, account, profile, isNewUser }) {
+    async signIn({ user, account }) {
       console.log(`User signed in: ${user.email} via ${account?.provider}`);
     },
     async signOut({ session, token }) {
