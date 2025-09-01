@@ -9,6 +9,7 @@ function Analytic({
   data,
   icon: Icon = TrendingUp,
   color = "blue",
+  period = "month",
 }: {
   className?: React.ReactNode;
   title: string;
@@ -16,9 +17,11 @@ function Analytic({
     value: string;
     percent: number;
     isHigher: boolean;
+    additionalInfo?: string;
   };
   icon?: React.ComponentType<{ className?: string }>;
   color?: string;
+  period?: "month" | "quarter" | "year";
 }) {
   const colorClasses = {
     blue: {
@@ -35,6 +38,11 @@ function Analytic({
       bg: "bg-purple-100 dark:bg-purple-900/50",
       text: "text-purple-600 dark:text-purple-400",
       iconBg: "bg-purple-50 dark:bg-purple-950/50",
+    },
+    red: {
+      bg: "bg-red-100 dark:bg-red-900/50",
+      text: "text-red-600 dark:text-red-400",
+      iconBg: "bg-red-50 dark:bg-red-950/50",
     },
   };
 
@@ -88,17 +96,28 @@ function Analytic({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <div
-            className={cn("w-2 h-2 rounded-full", {
-              "bg-green-500": data.isHigher,
-              "bg-red-500": !data.isHigher,
-            })}
-          />
-          <span>
-            {data.isHigher ? "Wzrost" : "Spadek"} w porównaniu do poprzedniego
-            miesiąca
-          </span>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div
+              className={cn("w-2 h-2 rounded-full", {
+                "bg-green-500": data.isHigher,
+                "bg-red-500": !data.isHigher,
+              })}
+            />
+            <span>
+              {data.isHigher ? "Wzrost" : "Spadek"} w porównaniu do poprzedniego{" "}
+              {period === "month"
+                ? "miesiąca"
+                : period === "quarter"
+                ? "kwartału"
+                : "roku"}
+            </span>
+          </div>
+          {data.additionalInfo && (
+            <div className="text-xs text-muted-foreground/80 bg-muted/50 rounded-md px-2 py-1">
+              {data.additionalInfo}
+            </div>
+          )}
         </div>
       </div>
     </div>

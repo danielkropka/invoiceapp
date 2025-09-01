@@ -5,7 +5,7 @@ export type ExtendedInvoice = Invoice & {
   creator: User;
 };
 
-export type InvoiceType = Invoice & {
+export type InvoiceType = Omit<Invoice, "file"> & {
   client: Client;
 };
 

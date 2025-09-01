@@ -20,6 +20,8 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 export default function Page() {
   const form = useForm<z.infer<typeof loginFormSchema>>({
@@ -27,6 +29,7 @@ export default function Page() {
   });
 
   const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const loginWithGoogle = async () => {
@@ -73,80 +76,132 @@ export default function Page() {
   };
 
   return (
-    <main className="flex justify-center items-center h-screen">
-      <div className="md:mx-auto max-w-md w-full border rounded my-4 mx-3 p-6 h-fit bg-muted/40 shadow-xl space-y-4">
-        <h2 className="text-center text-3xl font-semibold">Witaj ponownie!</h2>
-        <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input placeholder="example@fakturly.pl" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="space-y-1">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-primary/5 p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border border-border/50 rounded-2xl shadow-2xl p-8 space-y-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+          {/* Header */}
+          <div className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              <Lock className="w-6 h-6 text-primary" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Witaj ponownie!
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Zaloguj się do swojego konta, aby kontynuować
+            </p>
+          </div>
+
+          <Form {...form}>
+            <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
                 control={form.control}
-                name="password"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Hasło</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      E-mail
+                    </FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••••"
-                        {...field}
-                      />
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="example@fakturly.pl"
+                          className="pl-10 h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {/* TODO <div className="text-right">
-                <span className="text-sm text-muted-foreground hover:underline hover:cursor-pointer">
-                  Zapomniałeś hasła?
-                </span>
-              </div> */}
-            </div>
 
-            <Button type="submit" className="w-full" isLoading={isPending}>
-              Zaloguj się
-            </Button>
-          </form>
-        </Form>
-        <div>
-          <span className="text-sm text-muted-foreground">
-            Nie masz konta?{" "}
-            <Link
-              href={"/sign-up"}
-              className="text-blue-500 hover:underline hover:cursor-pointer"
-            >
-              Stwórz konto
-            </Link>
-          </span>
-        </div>
-        <div className="relative flex items-center my-4">
-          <span className="flex-grow border-muted-foreground border-t"></span>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="px-2 text-muted-foreground">lub</span>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Hasło</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••••"
+                          className="pl-10 pr-10 h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 p-0 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          )}
+                          <span className="sr-only">
+                            {showPassword ? "Ukryj hasło" : "Pokaż hasło"}
+                          </span>
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                isLoading={isPending}
+              >
+                {!isPending && <ArrowRight className="w-4 h-4 mr-2" />}
+                Zaloguj się
+              </Button>
+            </form>
+          </Form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border/50" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-3 text-muted-foreground font-medium">
+                lub
+              </span>
+            </div>
           </div>
-          <span className="flex-grow border-muted-foreground border-t"></span>
+
+          {/* Google Sign In */}
+          <Button
+            variant="outline"
+            onClick={loginWithGoogle}
+            disabled={isPending}
+            className="w-full h-11 border-border/50 hover:bg-accent/50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <GoogleIcon className="w-5 h-5 mr-2" />
+            Kontynuuj z Google
+          </Button>
+
+          {/* Sign Up Link */}
+          <div className="text-center">
+            <span className="text-sm text-muted-foreground">
+              Nie masz konta?{" "}
+              <Link
+                href="/sign-up"
+                className="text-primary hover:text-primary/80 font-medium hover:underline transition-colors duration-200"
+              >
+                Stwórz konto
+              </Link>
+            </span>
+          </div>
         </div>
-        <Button
-          className="w-full"
-          variant={"outline"}
-          onClick={loginWithGoogle}
-          disabled={isPending}
-        >
-          <GoogleIcon className="w-5 h-5" />
-        </Button>
       </div>
     </main>
   );

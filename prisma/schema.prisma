@@ -20,10 +20,6 @@ enum Method {
   BANK_TRANSFER
 }
 
-enum NotificationType {
-  CONFIRM_INVOICE
-}
-
 type Address {
   street     String
   postalCode String
@@ -36,15 +32,6 @@ type Product {
   price       Float
   quantity    Int
   vat         String?
-}
-
-type Notification {
-  type             NotificationType
-  invoiceId        String?
-  invoiceNumericId String?
-  read             Boolean          @default(false)
-
-  createdAt DateTime @default(now())
 }
 
 model Account {
@@ -84,8 +71,6 @@ model User {
   address       Address?
   taxIdNumber   String?
 
-  notifications Notification[]
-
   image    String?
   accounts Account[]
   sessions Session[]
@@ -107,6 +92,9 @@ model Client {
 
   creator   User   @relation(fields: [creatorId], references: [id])
   creatorId String
+
+  @@index([creatorId, createdAt])
+  @@index([email])
 }
 
 model Invoice {
@@ -132,4 +120,8 @@ model Invoice {
   fileBase64  String?
   fileName    String? @default("invoice.pdf")
   contentType String? @default("application/pdf")
+
+  @@index([creatorId, createdAt])
+  @@index([creatorId, status])
+  @@index([clientId])
 }

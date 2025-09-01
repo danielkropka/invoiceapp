@@ -27,12 +27,208 @@ import axios, { AxiosError } from "axios";
 import { clientFormSchema } from "@/lib/validators/validators";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, User, MapPin, Check, ChevronsUpDown } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type clientType = z.infer<typeof clientFormSchema>;
 
+// Lista krajów - najpopularniejsze kraje na początku
+const countries = [
+  "Polska",
+  "Niemcy",
+  "Francja",
+  "Wielka Brytania",
+  "Stany Zjednoczone",
+  "Kanada",
+  "Australia",
+  "Włochy",
+  "Hiszpania",
+  "Holandia",
+  "Belgia",
+  "Austria",
+  "Szwajcaria",
+  "Szwecja",
+  "Norwegia",
+  "Dania",
+  "Finlandia",
+  "Czechy",
+  "Słowacja",
+  "Węgry",
+  "Rumunia",
+  "Bułgaria",
+  "Chorwacja",
+  "Słowenia",
+  "Litwa",
+  "Łotwa",
+  "Estonia",
+  "Portugalia",
+  "Grecja",
+  "Cypr",
+  "Malta",
+  "Irlandia",
+  "Luksemburg",
+  "Japonia",
+  "Korea Południowa",
+  "Chiny",
+  "Indie",
+  "Brazylia",
+  "Argentyna",
+  "Meksyk",
+  "Chile",
+  "Kolumbia",
+  "Peru",
+  "Urugwaj",
+  "Paragwaj",
+  "Boliwia",
+  "Ekwador",
+  "Wenezuela",
+  "Gujana",
+  "Surinam",
+  "Gujana Francuska",
+  "Rosja",
+  "Ukraina",
+  "Białoruś",
+  "Moldawia",
+  "Gruzja",
+  "Armenia",
+  "Azerbejdżan",
+  "Kazachstan",
+  "Uzbekistan",
+  "Kirgistan",
+  "Tadżykistan",
+  "Turkmenistan",
+  "Mongolia",
+  "Chiny",
+  "Tajwan",
+  "Hongkong",
+  "Makau",
+  "Singapur",
+  "Malezja",
+  "Tajlandia",
+  "Wietnam",
+  "Kambodża",
+  "Laos",
+  "Mjanma",
+  "Filipiny",
+  "Indonezja",
+  "Brunei",
+  "Timor Wschodni",
+  "Papua-Nowa Gwinea",
+  "Fidżi",
+  "Vanuatu",
+  "Wyspy Salomona",
+  "Palau",
+  "Mikronezja",
+  "Marshall",
+  "Kiribati",
+  "Tuvalu",
+  "Nauru",
+  "Samoa",
+  "Tonga",
+  "Nowa Zelandia",
+  "RPA",
+  "Egipt",
+  "Libia",
+  "Tunezja",
+  "Algieria",
+  "Maroko",
+  "Sudan",
+  "Etiopia",
+  "Kenia",
+  "Tanzania",
+  "Uganda",
+  "Rwanda",
+  "Burundi",
+  "Demokratyczna Republika Konga",
+  "Republika Konga",
+  "Republika Środkowoafrykańska",
+  "Czad",
+  "Niger",
+  "Nigeria",
+  "Benin",
+  "Togo",
+  "Ghana",
+  "Burkina Faso",
+  "Mali",
+  "Senegal",
+  "Gambia",
+  "Gwinea Bissau",
+  "Gwinea",
+  "Sierra Leone",
+  "Liberia",
+  "Wybrzeże Kości Słoniowej",
+  "Mauretania",
+  "Mali",
+  "Burkina Faso",
+  "Niger",
+  "Nigeria",
+  "Kamerun",
+  "Republika Środkowoafrykańska",
+  "Czad",
+  "Sudan",
+  "Etiopia",
+  "Erytrea",
+  "Dżibuti",
+  "Somalia",
+  "Kenia",
+  "Uganda",
+  "Tanzania",
+  "Rwanda",
+  "Burundi",
+  "Demokratyczna Republika Konga",
+  "Republika Konga",
+  "Gabon",
+  "Gwinea Równikowa",
+  "Wyspy Świętego Tomasza i Książęca",
+  "Angola",
+  "Zambia",
+  "Zimbabwe",
+  "Botswana",
+  "Namibia",
+  "RPA",
+  "Lesotho",
+  "Suazi",
+  "Madagaskar",
+  "Mauritius",
+  "Seszele",
+  "Komory",
+  "Mozambik",
+  "Malawi",
+  "Zambia",
+  "Zimbabwe",
+  "Botswana",
+  "Namibia",
+  "RPA",
+];
+
 function ClientCreatorForm() {
+  const [open, setOpen] = React.useState(false);
   const form = useForm<clientType>({
     resolver: zodResolver(clientFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phoneNumber: "",
+      address: {
+        street: "",
+        postalCode: "",
+        city: "",
+        country: "Polska",
+      },
+      taxIdNumber: "",
+    },
   });
   const router = useRouter();
 
@@ -62,7 +258,7 @@ function ClientCreatorForm() {
           });
       }
 
-      return toast.error(err.message);
+      return toast.error("Wystąpił błąd podczas zapisywania klienta");
     },
     onSuccess: () => {
       toast.success("Pomyślnie zapisano klienta!");
@@ -73,144 +269,270 @@ function ClientCreatorForm() {
     },
   });
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tworzenie klienta</CardTitle>
-        <CardDescription>
-          Stworzenie klienta pozwoli usprawnić proces tworzenia faktury.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) => saveClient(data))}
-            className="flex flex-col gap-5 md:flex-row"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-2xl">
-              <span className="col-span-full text-2xl font-semibold">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header z przyciskiem powrotu */}
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Powrót
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Nowy klient</h1>
+          <p className="text-muted-foreground">
+            Dodaj nowego klienta do swojej bazy danych
+          </p>
+        </div>
+      </div>
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit((data) => saveClient(data))}
+          className="space-y-8"
+        >
+          {/* Sekcja podstawowych danych */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
                 Podstawowe dane
-              </span>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nazwa</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nazwa klienta" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>E-mail</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="invoices@domain.pl"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phoneNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Numer telefonu</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="123-456-789"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Te pole nie jest wymagane.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <span className="col-span-full text-2xl font-semibold">
-                Szczegóły
-              </span>
-              <FormField
-                control={form.control}
-                name="address.city"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Miejscowość</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Miejscowość klienta" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address.street"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Adres</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Adres klienta" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address.postalCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Kod pocztowy</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Kod pocztowy klienta" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="taxIdNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>NIP</FormLabel>
-                    <FormControl>
-                      <Input placeholder="NIP klienta" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Te pole nie jest wymagane.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+              </CardTitle>
+              <CardDescription>
+                Wprowadź podstawowe informacje o kliencie
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nazwa klienta *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="np. Firma ABC Sp. z o.o."
+                          {...field}
+                          className="h-11"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Adres e-mail *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="kontakt@firma.pl"
+                          {...field}
+                          className="h-11"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Numer telefonu</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="+48 123 456 789 lub +1 555 123 4567"
+                          {...field}
+                          className="h-11"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Opcjonalne pole - format międzynarodowy
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="taxIdNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Numer identyfikacji podatkowej</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="1234567890 (PL) lub DE123456789 (DE)"
+                          {...field}
+                          className="h-11"
+                          maxLength={20}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Opcjonalne pole - format zależny od kraju
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Sekcja adresu */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Adres
+              </CardTitle>
+              <CardDescription>
+                Wprowadź adres korespondencyjny klienta
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="address.street"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Ulica i numer *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="ul. Przykładowa 123 lub 123 Main Street"
+                          {...field}
+                          className="h-11"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="address.postalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kod pocztowy *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="00-000 (PL) lub 12345 (US)"
+                          {...field}
+                          className="h-11"
+                          maxLength={20}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="address.city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Miejscowość *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Warszawa"
+                          {...field}
+                          className="h-11"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="address.country"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Kraj *</FormLabel>
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={open}
+                              className="h-11 w-full justify-between"
+                            >
+                              {field.value || "Wybierz kraj..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput placeholder="Wyszukaj kraj..." />
+                            <CommandList>
+                              <CommandEmpty>Nie znaleziono kraju.</CommandEmpty>
+                              <CommandGroup>
+                                {countries.map((country) => (
+                                  <CommandItem
+                                    key={country}
+                                    value={country}
+                                    onSelect={(currentValue) => {
+                                      field.onChange(currentValue);
+                                      setOpen(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={`mr-2 h-4 w-4 ${
+                                        field.value === country
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      }`}
+                                    />
+                                    {country}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Przyciski akcji */}
+          <div className="flex justify-end gap-4 pt-6">
             <Button
-              type="submit"
-              className="md:self-end md:ml-auto"
-              isLoading={isPending}
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+              disabled={isPending}
+              className="h-11 px-8"
             >
-              Zapisz klienta
+              Anuluj
             </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+            <Button type="submit" disabled={isPending} className="h-11 px-8">
+              {isPending ? "Zapisywanie..." : "Zapisz klienta"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }
 

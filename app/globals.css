@@ -99,3 +99,58 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* Custom scrollbar styles for tables */
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-x-scroll::-webkit-scrollbar {
+  height: 30px !important;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track,
+.overflow-x-scroll::-webkit-scrollbar-track {
+  background: #fbbf24 !important;
+  border-radius: 15px !important;
+  margin: 0 20px !important;
+  border: 4px solid #f59e0b !important;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb,
+.overflow-x-scroll::-webkit-scrollbar-thumb {
+  background: #dc2626 !important;
+  border-radius: 15px !important;
+  border: 5px solid #fbbf24 !important;
+  min-width: 100px !important;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover,
+.overflow-x-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b91c1c !important;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:active,
+.overflow-x-scroll::-webkit-scrollbar-thumb:active {
+  background: #991b1b !important;
+}
+
+/* Dark mode scrollbar */
+.dark .overflow-x-auto::-webkit-scrollbar-track,
+.dark .overflow-x-scroll::-webkit-scrollbar-track {
+  background: #fbbf24 !important;
+  border: 4px solid #f59e0b !important;
+}
+
+.dark .overflow-x-auto::-webkit-scrollbar-thumb,
+.dark .overflow-x-scroll::-webkit-scrollbar-thumb {
+  background: #dc2626 !important;
+  border: 5px solid #fbbf24 !important;
+}
+
+.dark .overflow-x-auto::-webkit-scrollbar-thumb:hover,
+.dark .overflow-x-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b91c1c !important;
+}
+
+.dark .overflow-x-auto::-webkit-scrollbar-thumb:active,
+.dark .overflow-x-scroll::-webkit-scrollbar-thumb:active {
+  background: #991b1b !important;
+}

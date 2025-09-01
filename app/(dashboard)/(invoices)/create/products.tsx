@@ -62,34 +62,34 @@ export default function Products({
       </div>
 
       {/* Products Table */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-        <Table className="products-table">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm overflow-x-auto mx-2 sm:mx-0">
+        <Table className="products-table min-w-full">
           <TableCaption className="py-4 text-gray-600 dark:text-gray-400">
             Lista produktów i usług w fakturze
           </TableCaption>
           <TableHeader>
             <TableRow className="hover:bg-transparent border-b border-gray-200 dark:border-gray-700">
-              <TableHead className="font-medium text-gray-700 dark:text-gray-300 rounded-l-lg pl-6">
+              <TableHead className="font-medium text-gray-700 dark:text-gray-300 rounded-l-lg pl-2 sm:pl-4 min-w-[100px]">
                 Produkt/usługa
               </TableHead>
-              <TableHead className="font-medium text-gray-700 dark:text-gray-300">
+              <TableHead className="font-medium text-gray-700 dark:text-gray-300 hidden sm:table-cell min-w-[120px]">
                 Opis
               </TableHead>
-              <TableHead className="font-medium text-gray-700 dark:text-gray-300">
+              <TableHead className="font-medium text-gray-700 dark:text-gray-300 min-w-[90px]">
                 Cena netto
               </TableHead>
-              <TableHead className="font-medium text-gray-700 dark:text-gray-300">
+              <TableHead className="font-medium text-gray-700 dark:text-gray-300 min-w-[70px]">
                 Ilość
               </TableHead>
               <TableHead
                 className={cn(
-                  "font-medium text-gray-700 dark:text-gray-300",
+                  "font-medium text-gray-700 dark:text-gray-300 min-w-[70px]",
                   form.watch("exemptTax") && "hidden"
                 )}
               >
                 VAT
               </TableHead>
-              <TableHead className="w-16 rounded-r-lg"></TableHead>
+              <TableHead className="w-10 sm:w-12 rounded-r-lg"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -98,14 +98,14 @@ export default function Products({
                 key={product.id}
                 className="group hover:bg-gray-50/80 dark:hover:bg-gray-800/80 transition-all duration-200 border-b border-gray-100 dark:border-gray-800 last:border-b-0"
               >
-                <TableCell className="pl-6">
+                <TableCell className="pl-2 sm:pl-4">
                   <FormField
                     name={`products.${index}.name`}
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
                           <Input
-                            className="w-[150px] md:w-full border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
+                            className="w-full min-w-[100px] border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
                             type="text"
                             placeholder="Nazwa produktu/usługi"
                             {...field}
@@ -116,14 +116,14 @@ export default function Products({
                     )}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <FormField
                     name={`products.${index}.description`}
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
                           <Input
-                            className="w-[150px] md:w-full border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
+                            className="w-full border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
                             type="text"
                             placeholder="Opis produktu/usługi"
                             {...field}
@@ -141,7 +141,7 @@ export default function Products({
                       <FormItem>
                         <FormControl>
                           <Input
-                            className="w-[150px] md:w-full border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
+                            className="w-full min-w-[90px] border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
                             type="number"
                             placeholder="0.00"
                             step="0.01"
@@ -161,7 +161,7 @@ export default function Products({
                       <FormItem>
                         <FormControl>
                           <Input
-                            className="w-[150px] md:w-full border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
+                            className="w-full min-w-[70px] border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:text-gray-100"
                             type="number"
                             placeholder="1"
                             min="0"
@@ -189,7 +189,7 @@ export default function Products({
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="w-[150px] md:w-full border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-100">
+                            <SelectTrigger className="w-full min-w-[70px] border-0 bg-transparent focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-100">
                               <SelectValue placeholder="Wybierz VAT" />
                             </SelectTrigger>
                           </FormControl>

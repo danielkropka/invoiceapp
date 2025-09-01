@@ -2,6 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/prisma";
 import { z } from "zod";
 import { clientFormSchema } from "@/lib/validators/validators";
+import { invalidateUserCache } from "@/lib/cache";
 
 export async function POST(req: Request) {
   try {
@@ -33,6 +34,9 @@ export async function POST(req: Request) {
       },
     });
 
+    // Wyczyść cache po utworzeniu klienta
+    invalidateUserCache(session.user.id);
+
     return new Response("Client created", { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -59,6 +63,9 @@ export async function DELETE(req: Request) {
         creatorId: session.user.id,
       },
     });
+
+    // Wyczyść cache po usunięciu klienta
+    invalidateUserCache(session.user.id);
 
     return new Response("Client deleted", { status: 200 });
   } catch (error) {

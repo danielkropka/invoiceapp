@@ -5,6 +5,7 @@ import { invoiceFormSchema } from "@/lib/validators/validators";
 import { Invoice } from "@prisma/client";
 import chromium from "@sparticuz/chromium";
 import { z } from "zod";
+import { invalidateUserCache } from "@/lib/cache";
 
 export async function POST(req: Request) {
   let browser;
@@ -42,12 +43,16 @@ export async function POST(req: Request) {
         products,
         clientId,
         creatorId: session.user.id,
+        status: "UNPAID", // Faktura jest zapisana ale nie wysłana
       },
       include: {
         creator: true,
         client: true,
       },
     });
+
+    // Wyczyść cache po utworzeniu faktury
+    invalidateUserCache(session.user.id);
 
     const ReactDOMServer = (await import("react-dom/server")).default;
     const InvoiceTemplate = await getInvoiceTemplate();
@@ -171,6 +176,9 @@ export async function DELETE(req: Request) {
         creatorId: session.user.id,
       },
     });
+
+    // Wyczyść cache po usunięciu faktury
+    invalidateUserCache(session.user.id);
 
     return new Response("Invoice deleted", { status: 200 });
   } catch (error) {

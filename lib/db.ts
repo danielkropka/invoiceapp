@@ -4,6 +4,15 @@ import { db } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { Client, Invoice } from "@prisma/client";
 import { InvoiceType } from "@/types/db";
+import {
+  getCachedInvoices,
+  setCachedInvoices,
+  getCachedClients,
+  setCachedClients,
+  getCachedAnalytics,
+  setCachedAnalytics,
+  invalidateUserCache,
+} from "@/lib/cache";
 
 /* function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -22,61 +31,143 @@ export async function getInvoices(
   if (!session?.user)
     return { invoices: [], newOffset: null, totalInvoices: 0 };
   const user = session.user;
+
+  // Sprawdź cache
+  const cached = getCachedInvoices(user.id, search, offset);
+  if (cached) {
+    return cached as {
+      invoices: InvoiceType[];
+      newOffset: number | null;
+      totalInvoices: number;
+    };
+  }
+
+  let result: {
+    invoices: InvoiceType[];
+    newOffset: number | null;
+    totalInvoices: number;
+  };
+
   if (search) {
-    return {
-      invoices: await db.invoice.findMany({
-        where: {
-          creatorId: user.id,
-          client: {
-            email: {
-              contains: search,
-            },
+    const invoices = await db.invoice.findMany({
+      where: {
+        creatorId: user.id,
+        client: {
+          email: {
+            contains: search,
+            mode: "insensitive",
           },
         },
-        include: {
-          client: true,
+      },
+      select: {
+        id: true,
+        token: true,
+        invoiceId: true,
+        status: true,
+        paymentMethod: true,
+        exemptTax: true,
+        issuedAt: true,
+        soldAt: true,
+        createdAt: true,
+        updatedAt: true,
+        creatorId: true,
+        clientId: true,
+        fileBase64: true,
+        fileName: true,
+        contentType: true,
+        products: true,
+        client: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            address: true,
+            taxIdNumber: true,
+            createdAt: true,
+            creatorId: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 50, // Limit wyników wyszukiwania
+    });
+
+    result = {
+      invoices,
+      newOffset: null,
+      totalInvoices: invoices.length,
+    };
+  } else if (offset === null) {
+    result = { invoices: [], newOffset: null, totalInvoices: 0 };
+  } else {
+    // Równoległe zapytania dla lepszej wydajności
+    const [totalInvoices, moreInvoices] = await Promise.all([
+      db.invoice.count({
+        where: {
+          creatorId: user.id,
+        },
+      }),
+      db.invoice.findMany({
+        where: {
+          creatorId: user.id,
+        },
+        select: {
+          id: true,
+          token: true,
+          invoiceId: true,
+          status: true,
+          paymentMethod: true,
+          exemptTax: true,
+          issuedAt: true,
+          soldAt: true,
+          createdAt: true,
+          updatedAt: true,
+          creatorId: true,
+          clientId: true,
+          file: true,
+          fileBase64: true,
+          fileName: true,
+          contentType: true,
+          products: true,
+          client: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phoneNumber: true,
+              address: true,
+              taxIdNumber: true,
+              createdAt: true,
+              creatorId: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
         },
+        skip: offset,
+        take: 10, // Zwiększamy limit na stronę dla lepszej wydajności
       }),
-      newOffset: null,
-      totalInvoices: 0,
+    ]);
+
+    // Sprawdź czy są więcej stron
+    const hasMorePages = offset + moreInvoices.length < totalInvoices;
+    const newOffset = hasMorePages ? offset + moreInvoices.length : null;
+
+    result = {
+      invoices: moreInvoices,
+      newOffset,
+      totalInvoices,
     };
   }
 
-  if (offset === null) {
-    return { invoices: [], newOffset: null, totalInvoices: 0 };
-  }
+  // Zapisz w cache
+  setCachedInvoices(user.id, search, offset, result);
 
-  const totalInvoices = await db.invoice.count({
-    where: {
-      creatorId: user.id,
-    },
-  });
-  const moreInvoices = await db.invoice.findMany({
-    where: {
-      creatorId: user.id,
-    },
-    include: {
-      client: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    skip: offset,
-    take: 5,
-  });
-
-  // Sprawdź czy są więcej stron
-  const hasMorePages = offset + moreInvoices.length < totalInvoices;
-  const newOffset = hasMorePages ? offset + moreInvoices.length : null;
-
-  return {
-    invoices: moreInvoices,
-    newOffset,
-    totalInvoices: totalInvoices,
-  };
+  return result;
 }
 
 export async function generateUniqueInvoiceId(): Promise<{
@@ -118,89 +209,208 @@ export async function getClients(
   if (!session?.user) return { clients: [], newOffset: null, totalClients: 0 };
   const user = session.user;
 
+  // Sprawdź cache
+  const cached = getCachedClients(user.id, search, offset, getAll);
+  if (cached) {
+    return cached as {
+      clients: Client[];
+      newOffset: number | null;
+      totalClients: number;
+    };
+  }
+
+  let result: {
+    clients: Client[];
+    newOffset: number | null;
+    totalClients: number;
+  };
+
   if (getAll) {
     const clients = await db.client.findMany({
       where: {
         creatorId: user.id,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        address: true,
+        taxIdNumber: true,
+        createdAt: true,
+        creatorId: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
-    return {
+    result = {
       clients,
       newOffset: null,
       totalClients: clients.length,
     };
-  }
-
-  if (search) {
+  } else if (search) {
     const clients = await db.client.findMany({
       where: {
         creatorId: user.id,
         email: {
           contains: search,
+          mode: "insensitive",
         },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        address: true,
+        taxIdNumber: true,
+        createdAt: true,
+        creatorId: true,
       },
       orderBy: {
         createdAt: "desc",
       },
+      take: 50, // Limit wyników wyszukiwania
     });
 
-    return {
+    result = {
       clients,
       newOffset: null,
       totalClients: clients.length,
     };
-  }
-
-  if (offset !== null) {
-    const totalClients = await db.client.count({
-      where: {
-        creatorId: user.id,
-      },
-    });
-
-    const moreClients = await db.client.findMany({
-      where: {
-        creatorId: user.id,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip: offset,
-      take: 5,
-    });
+  } else if (offset !== null) {
+    // Równoległe zapytania dla lepszej wydajności
+    const [totalClients, moreClients] = await Promise.all([
+      db.client.count({
+        where: {
+          creatorId: user.id,
+        },
+      }),
+      db.client.findMany({
+        where: {
+          creatorId: user.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phoneNumber: true,
+          address: true,
+          taxIdNumber: true,
+          createdAt: true,
+          creatorId: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: offset,
+        take: 10, // Zwiększamy limit na stronę
+      }),
+    ]);
 
     // Sprawdź czy są więcej stron
     const hasMorePages = offset + moreClients.length < totalClients;
     const newOffset = hasMorePages ? offset + moreClients.length : null;
 
-    return {
+    result = {
       clients: moreClients,
       newOffset,
-      totalClients: totalClients,
+      totalClients,
     };
+  } else {
+    result = { clients: [], newOffset: null, totalClients: 0 };
   }
 
-  return { clients: [], newOffset: null, totalClients: 0 };
+  // Zapisz w cache
+  setCachedClients(user.id, search, offset, getAll, result);
+
+  return result;
 }
 
 export async function getAnalyticData(): Promise<{
-  invoices: Invoice[];
+  invoices: Omit<Invoice, "file">[];
   clients: Client[];
 }> {
   const session = await getAuthSession();
   if (!session?.user) return { invoices: [], clients: [] };
 
-  return {
-    invoices: await db.invoice.findMany({
+  // Sprawdź cache
+  const cached = getCachedAnalytics(session.user.id);
+  if (cached) {
+    return cached as {
+      invoices: Omit<Invoice, "file">[];
+      clients: Client[];
+    };
+  }
+
+  // Równoległe zapytania dla lepszej wydajności
+  const [invoices, clients] = await Promise.all([
+    // Pobierz faktury z klientami (bez pola file)
+    db.invoice.findMany({
       where: {
         creatorId: session.user.id,
       },
+      select: {
+        id: true,
+        token: true,
+        invoiceId: true,
+        status: true,
+        paymentMethod: true,
+        exemptTax: true,
+        issuedAt: true,
+        soldAt: true,
+        createdAt: true,
+        updatedAt: true,
+        creatorId: true,
+        clientId: true,
+        fileBase64: true,
+        fileName: true,
+        contentType: true,
+        products: true,
+        client: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            address: true,
+            taxIdNumber: true,
+            createdAt: true,
+            creatorId: true,
+          },
+        },
+      },
+      orderBy: {
+        issuedAt: "desc",
+      },
     }),
-    clients: await db.client.findMany({
+    // Pobierz klientów
+    db.client.findMany({
       where: {
         creatorId: session.user.id,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        address: true,
+        taxIdNumber: true,
+        createdAt: true,
+        creatorId: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     }),
-  };
+  ]);
+
+  const result = { invoices, clients };
+
+  // Zapisz w cache
+  setCachedAnalytics(session.user.id, result);
+
+  return result;
 }

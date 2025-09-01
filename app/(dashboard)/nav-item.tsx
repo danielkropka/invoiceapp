@@ -20,6 +20,7 @@ const NavItem = ({
   children: React.ReactNode;
 }) => {
   const pathname = usePathname();
+  const isActive = href === pathname;
 
   return (
     <Tooltip>
@@ -27,17 +28,28 @@ const NavItem = ({
         <Link
           href={href}
           className={clsx(
-            "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
+            "group flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-200 hover:scale-105 active:scale-95",
             {
-              "bg-accent": href === pathname,
+              "bg-primary text-primary-foreground shadow-md": isActive,
+              "text-muted-foreground hover:text-foreground hover:bg-accent":
+                !isActive,
             }
           )}
         >
-          {children}
+          <div
+            className={clsx("transition-transform duration-200", {
+              "scale-110": isActive,
+              "group-hover:scale-105": !isActive,
+            })}
+          >
+            {children}
+          </div>
           <span className="sr-only">{label}</span>
         </Link>
       </TooltipTrigger>
-      <TooltipContent side="right">{label}</TooltipContent>
+      <TooltipContent side="right" className="font-medium">
+        {label}
+      </TooltipContent>
     </Tooltip>
   );
 };

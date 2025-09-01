@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useTransition } from "react";
+import React, { useTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GoogleIcon } from "@/components/icons";
 import { signIn } from "next-auth/react";
@@ -20,6 +20,15 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  ArrowRight,
+  UserPlus,
+} from "lucide-react";
 
 export default function Page() {
   const form = useForm<z.infer<typeof registerFormSchema>>({
@@ -27,6 +36,8 @@ export default function Page() {
   });
 
   const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const loginWithGoogle = async () => {
     try {
@@ -60,105 +71,197 @@ export default function Page() {
   };
 
   return (
-    <main className="flex justify-center items-center h-screen">
-      <div className="md:mx-auto max-w-md w-full border rounded my-4 mx-3 p-6 h-fit bg-muted/40 shadow-xl space-y-4">
-        <h2 className="text-center text-3xl font-semibold">
-          Witaj w fakturly!
-        </h2>
-        <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input placeholder="example@fakturly.pl" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Imię i nazwisko / nazwa firmy</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Fakturly" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hasło</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••••••"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="repeatPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Powtórz hasło</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••••••"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" className="w-full" isLoading={isPending}>
-              Rozpocznij fakturowanie
-            </Button>
-          </form>
-        </Form>
-        <div>
-          <span className="text-sm text-muted-foreground">
-            Masz już konto?{" "}
-            <Link
-              href={"/sign-in"}
-              className="text-blue-500 hover:underline hover:cursor-pointer"
-            >
-              Zaloguj się
-            </Link>
-          </span>
-        </div>
-        <div className="relative flex items-center my-4">
-          <span className="flex-grow border-muted-foreground border-t"></span>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="px-2 text-muted-foreground">lub</span>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-primary/5 p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border border-border/50 rounded-2xl shadow-2xl p-8 space-y-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+          {/* Header */}
+          <div className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              <UserPlus className="w-6 h-6 text-primary" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Witaj w Fakturly!
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Stwórz konto, aby rozpocząć fakturowanie
+            </p>
           </div>
-          <span className="flex-grow border-muted-foreground border-t"></span>
+
+          <Form {...form}>
+            <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      E-mail
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="example@fakturly.pl"
+                          className="pl-10 h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      Imię i nazwisko / nazwa firmy
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="Fakturly"
+                          className="pl-10 h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Hasło</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••••"
+                          className="pl-10 pr-10 h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 p-0 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          )}
+                          <span className="sr-only">
+                            {showPassword ? "Ukryj hasło" : "Pokaż hasło"}
+                          </span>
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="repeatPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      Powtórz hasło
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          type={showRepeatPassword ? "text" : "password"}
+                          placeholder="••••••••••"
+                          className="pl-10 pr-10 h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 p-0 hover:bg-transparent"
+                          onClick={() =>
+                            setShowRepeatPassword(!showRepeatPassword)
+                          }
+                        >
+                          {showRepeatPassword ? (
+                            <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          )}
+                          <span className="sr-only">
+                            {showRepeatPassword ? "Ukryj hasło" : "Pokaż hasło"}
+                          </span>
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                isLoading={isPending}
+              >
+                {!isPending && <ArrowRight className="w-4 h-4 mr-2" />}
+                Rozpocznij fakturowanie
+              </Button>
+            </form>
+          </Form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border/50" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-3 text-muted-foreground font-medium">
+                lub
+              </span>
+            </div>
+          </div>
+
+          {/* Google Sign Up */}
+          <Button
+            variant="outline"
+            onClick={loginWithGoogle}
+            disabled={isPending}
+            className="w-full h-11 border-border/50 hover:bg-accent/50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <GoogleIcon className="w-5 h-5 mr-2" />
+            Kontynuuj z Google
+          </Button>
+
+          {/* Sign In Link */}
+          <div className="text-center">
+            <span className="text-sm text-muted-foreground">
+              Masz już konto?{" "}
+              <Link
+                href="/sign-in"
+                className="text-primary hover:text-primary/80 font-medium hover:underline transition-colors duration-200"
+              >
+                Zaloguj się
+              </Link>
+            </span>
+          </div>
         </div>
-        <Button
-          className="w-full"
-          variant={"outline"}
-          onClick={loginWithGoogle}
-          disabled={isPending}
-        >
-          <GoogleIcon className="w-5 h-5" />
-        </Button>
       </div>
     </main>
   );

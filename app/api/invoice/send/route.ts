@@ -3,6 +3,7 @@ import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/prisma";
 import { SendEmailToClientType } from "@/types/db";
 import { Resend } from "resend";
+import { invalidateUserCache } from "@/lib/cache";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -29,8 +30,13 @@ export async function POST(req: Request) {
     if (!invoiceExists)
       return new Response("Invoice was not found.", { status: 404 });
 
-    if (invoiceExists.status === "PENDING" || invoiceExists.status === "PAID")
-      return new Response("Notification to client was already sent.", {
+    if (invoiceExists.status === "PENDING")
+      return new Response("Email to client was already sent.", {
+        status: 409,
+      });
+
+    if (invoiceExists.status === "PAID")
+      return new Response("Invoice is already paid and cannot be resent.", {
         status: 409,
       });
 
@@ -62,6 +68,9 @@ export async function POST(req: Request) {
         status: "PENDING",
       },
     });
+
+    // Wyczyść cache po zmianie statusu faktury
+    invalidateUserCache(session.user.id);
 
     return new Response("Email sent.", { status: 200 });
   } catch (err) {

@@ -15,7 +15,7 @@ export default function Pagination({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
   const [isPending, startTransition] = useTransition();
 
   // Konwertuj offset na liczbę jeśli jest stringiem
@@ -48,7 +48,7 @@ export default function Pagination({
     });
   };
 
-  // Pokaż paginację tylko jeśli są więcej niż 5 elementów
+  // Pokaż paginację tylko jeśli są więcej niż 10 elementów
   if (total <= rowsPerPage) return null;
 
   return (
