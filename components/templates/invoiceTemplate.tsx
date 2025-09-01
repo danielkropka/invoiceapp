@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Client, Invoice, User } from "@prisma/client";
+import { ExtendedInvoice } from "@/types/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import moment from "moment";
 import "moment/locale/pl";
@@ -19,10 +19,7 @@ function InvoiceTemplate({
   invoice,
   children,
 }: {
-  invoice: Invoice & {
-    client: Client;
-    creator: User;
-  };
+  invoice: ExtendedInvoice;
   children: ReactNode;
 }) {
   const {
