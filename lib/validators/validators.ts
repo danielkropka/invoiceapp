@@ -109,6 +109,7 @@ export const addressFormSchema = z.object({
     message: "Kod pocztowy musi być w formacie 00-000",
   }),
   city: z.string(),
+  country: z.string().default("Polska"),
   nip: z.string().max(10).min(10).optional(),
 });
 
