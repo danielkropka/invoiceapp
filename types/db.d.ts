@@ -1,6 +1,6 @@
 import { Client, Invoice, User } from "@prisma/client";
 
-export type ExtendedInvoice = Invoice & {
+export type ExtendedInvoice = Omit<Invoice, "file"> & {
   client: Client;
   creator: User;
 };
