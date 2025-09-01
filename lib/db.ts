@@ -329,7 +329,7 @@ export async function getClients(
 }
 
 export async function getAnalyticData(): Promise<{
-  invoices: Omit<Invoice, "file">[];
+  invoices: (Omit<Invoice, "file"> & { client: Client })[];
   clients: Client[];
 }> {
   const session = await getAuthSession();
@@ -339,7 +339,7 @@ export async function getAnalyticData(): Promise<{
   const cached = getCachedAnalytics(session.user.id);
   if (cached) {
     return cached as {
-      invoices: Omit<Invoice, "file">[];
+      invoices: (Omit<Invoice, "file"> & { client: Client })[];
       clients: Client[];
     };
   }
