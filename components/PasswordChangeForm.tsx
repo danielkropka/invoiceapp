@@ -87,11 +87,8 @@ export default function PasswordChangeForm() {
 
   // Monitorowanie zmian w formularzu
   const watchedValues = form.watch();
-  const hasFormChanges = Object.values(watchedValues).some(
-    (value) => value.length > 0
-  );
 
-  const onSubmit = (data: PasswordChangeData) => {
+  const onSubmit = () => {
     startTransition(async () => {
       try {
         // Symulacja API call - w rzeczywistej aplikacji tutaj byłby prawdziwy endpoint
@@ -104,6 +101,7 @@ export default function PasswordChangeForm() {
             "Twoje nowe hasło jest już aktywne. Pamiętaj o bezpiecznym przechowywaniu.",
         });
       } catch (error) {
+        console.error("Error changing password:", error);
         toast.error("Wystąpił błąd podczas zmiany hasła", {
           description: "Sprawdź aktualne hasło i spróbuj ponownie.",
         });

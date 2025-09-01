@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
     try {
       body = await req.json();
     } catch (error) {
+      console.error("Error parsing JSON:", error);
       return NextResponse.json(
         { error: "Nieprawidłowy format JSON" },
         { status: 400 }

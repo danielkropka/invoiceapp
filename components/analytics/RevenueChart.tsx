@@ -9,11 +9,11 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  TooltipContentProps,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { TooltipPayloadEntry } from "recharts/types/state/tooltipSlice";
 
 interface RevenueChartProps {
   invoices: Array<{
@@ -207,7 +207,7 @@ export default function RevenueChart({
                 tick={{ fontSize: 12 }}
               />
               <Tooltip
-                content={(props: any) => {
+                content={(props: TooltipContentProps<number, string>) => {
                   const { active, payload, label } = props;
                   if (active && payload && payload.length) {
                     return (
@@ -215,18 +215,20 @@ export default function RevenueChart({
                         <p className="font-medium text-foreground mb-2">
                           {String(label)}
                         </p>
-                        {payload.map((entry: any, index: number) => (
-                          <p
-                            key={index}
-                            className="text-sm"
-                            style={{ color: entry.color }}
-                          >
-                            {entry.name}:{" "}
-                            {entry.name === "Przychody"
-                              ? formatCurrency(entry.value as number)
-                              : entry.value}
-                          </p>
-                        ))}
+                        {payload.map(
+                          (entry: TooltipPayloadEntry, index: number) => (
+                            <p
+                              key={index}
+                              className="text-sm"
+                              style={{ color: entry.color }}
+                            >
+                              {entry.name}:{" "}
+                              {entry.name === "Przychody"
+                                ? formatCurrency(entry.value as number)
+                                : entry.value}
+                            </p>
+                          )
+                        )}
                       </div>
                     );
                   }

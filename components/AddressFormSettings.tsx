@@ -53,11 +53,6 @@ export default function AddressFormSettings({
 
   // Monitorowanie zmian w formularzu
   const watchedValues = form.watch();
-  const hasFormChanges = Object.keys(watchedValues).some(
-    (key) =>
-      watchedValues[key as keyof typeof watchedValues] !==
-      (address?.[key as keyof Address] || "")
-  );
 
   const onSubmit = (data: z.infer<typeof addressFormSchema>) => {
     startTransition(async () => {
@@ -69,6 +64,7 @@ export default function AddressFormSettings({
             "Twoje dane zostały zapisane i będą widoczne na fakturach.",
         });
       } catch (error) {
+        console.error("Error updating address:", error);
         toast.error("Wystąpił błąd podczas aktualizacji danych", {
           description:
             "Spróbuj ponownie za chwilę lub skontaktuj się z pomocą techniczną.",

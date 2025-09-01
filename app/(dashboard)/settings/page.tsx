@@ -12,18 +12,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
   User,
   MapPin,
-  Shield,
-  Bell,
-  Palette,
-  Key,
-  Camera,
   CheckCircle,
-  AlertCircle,
   Settings as SettingsIcon,
 } from "lucide-react";
 
