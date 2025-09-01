@@ -25,10 +25,15 @@ export default async function InvoicePage({
   });
 
   if (!invoice) return notFound();
-  if (invoice.file) {
-    invoice.fileBase64 = invoice.file.toString("base64");
-    invoice.file = null;
-  }
 
-  return <Invoice invoice={invoice} />;
+  // Konwertuj file na base64 jeśli istnieje
+  const invoiceWithBase64 = {
+    ...invoice,
+    fileBase64: invoice.file ? invoice.file.toString("base64") : null,
+  };
+
+  // Usuń pole file z obiektu
+  const { file, ...invoiceWithoutFile } = invoiceWithBase64;
+
+  return <Invoice invoice={invoiceWithoutFile} />;
 }
