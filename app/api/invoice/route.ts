@@ -18,9 +18,12 @@ export async function POST(req: Request) {
     const { invoiceId, issuedAt, soldAt, products, clientId, exemptTax } =
       invoiceFormSchema.parse(body);
 
+    // Generuj invoiceId jeśli nie zostało podane
+    const finalInvoiceId = invoiceId || `INV-${Date.now()}`;
+
     const invoiceExist = await db.invoice.findFirst({
       where: {
-        invoiceId,
+        invoiceId: finalInvoiceId,
         creatorId: session.user.id,
       },
     });
@@ -33,7 +36,7 @@ export async function POST(req: Request) {
     const invoice = await db.invoice.create({
       data: {
         exemptTax,
-        invoiceId,
+        invoiceId: finalInvoiceId,
         issuedAt,
         soldAt,
         products,
@@ -100,7 +103,7 @@ export async function POST(req: Request) {
       },
       data: {
         file: pdf,
-        fileName: invoice.invoiceId,
+        fileName: finalInvoiceId,
       },
     });
 
