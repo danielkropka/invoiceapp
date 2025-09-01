@@ -19,8 +19,6 @@ export default async function InvoicesCardContent({
 
   const { invoices, totalInvoices } = await getInvoices(search, offset);
 
-  invoices.forEach((invoice) => (invoice.file = null));
-
   return (
     <>
       <CardContent className="p-0">
