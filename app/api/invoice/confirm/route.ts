@@ -1,11 +1,12 @@
 import { db } from "@/lib/prisma";
+import { invalidateUserCache } from "@/lib/cache";
 
 export async function POST(req: Request) {
   try {
     const body: { token: string } = await req.json();
 
     const invoiceToConfirm = await db.invoice.findFirst({
-      select: { creatorId: true, invoiceId: true, id: true },
+      select: { id: true, status: true },
       where: {
         token: body.token,
       },
@@ -14,49 +15,34 @@ export async function POST(req: Request) {
     if (!invoiceToConfirm)
       return new Response("Invoice was not found.", { status: 404 });
 
-    const invoiceCreator = await db.user.findFirst({
-      select: { notifications: true, id: true },
+    // Sprawdź czy faktura nie jest już opłacona
+    if (invoiceToConfirm.status === "PAID")
+      return new Response("Invoice is already paid.", { status: 409 });
+
+    // Zmień status na PAID
+    const updatedInvoice = await db.invoice.update({
       where: {
-        id: invoiceToConfirm.creatorId,
-      },
-    });
-
-    if (!invoiceCreator)
-      return new Response("Creator of invoice was not found.", {
-        status: 404,
-      });
-
-    if (
-      invoiceCreator.notifications.find(
-        (notification) => notification.invoiceId === invoiceToConfirm.invoiceId
-      )
-    )
-      return new Response("Notification was already sent.", { status: 409 });
-
-    await db.user.update({
-      where: {
-        id: invoiceCreator.id,
+        id: invoiceToConfirm.id,
       },
       data: {
-        notifications: [
-          ...invoiceCreator.notifications,
-          {
-            invoiceId: invoiceToConfirm.id,
-            invoiceNumericId: invoiceToConfirm.invoiceId,
-            type: "CONFIRM_INVOICE",
-            read: false,
-            createdAt: new Date(),
-          },
-        ],
+        status: "PAID",
+      },
+      select: {
+        creatorId: true,
       },
     });
 
-    return new Response("Notify sent", { status: 200 });
+    // Wyczyść cache po zmianie statusu faktury
+    invalidateUserCache(updatedInvoice.creatorId);
+
+    return new Response("Invoice confirmed and marked as paid", {
+      status: 200,
+    });
   } catch (err) {
-    if (err)
-      return new Response(
-        "There was an error while confirming your invoice payment.",
-        { status: 500 }
-      );
+    console.error("Error confirming invoice:", err);
+    return new Response(
+      "There was an error while confirming your invoice payment.",
+      { status: 500 }
+    );
   }
 }

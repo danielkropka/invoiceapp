@@ -55,15 +55,68 @@ function filterByMonth<
   });
 }
 
+// Funkcja pomocnicza do filtrowania danych według okresu
+function filterByPeriod<
+  T extends { [K in DateKey]: Date },
+  DateKey extends keyof T
+>(
+  items: T[],
+  dateKey: DateKey,
+  period: "month" | "quarter" | "year",
+  offset: number = 0
+): T[] {
+  const currentDate = new Date();
+  const targetDate = new Date(currentDate);
+
+  switch (period) {
+    case "month":
+      targetDate.setMonth(currentDate.getMonth() + offset);
+      break;
+    case "quarter":
+      targetDate.setMonth(currentDate.getMonth() + offset * 3);
+      break;
+    case "year":
+      targetDate.setFullYear(currentDate.getFullYear() + offset);
+      break;
+  }
+
+  return items.filter((item) => {
+    const itemDate = item[dateKey];
+    const itemYear = itemDate.getFullYear();
+    const itemMonth = itemDate.getMonth();
+    const targetYear = targetDate.getFullYear();
+    const targetMonth = targetDate.getMonth();
+
+    switch (period) {
+      case "month":
+        return itemYear === targetYear && itemMonth === targetMonth;
+      case "quarter":
+        const itemQuarter = Math.floor(itemMonth / 3);
+        const targetQuarter = Math.floor(targetMonth / 3);
+        return itemYear === targetYear && itemQuarter === targetQuarter;
+      case "year":
+        return itemYear === targetYear;
+      default:
+        return false;
+    }
+  });
+}
+
 export const getAnalytics = (
   invoices: Invoice[],
   clients: Client[],
-  analyticType: string
-): { value: string; percent: number; isHigher: boolean } => {
-  const invoicesOfLastMonth = filterByMonth(invoices, "issuedAt", -1);
-  const invoicesOfThisMonth = filterByMonth(invoices, "issuedAt", 0);
+  analyticType: string,
+  period: "month" | "quarter" | "year" = "month"
+): {
+  value: string;
+  percent: number;
+  isHigher: boolean;
+  additionalInfo?: string;
+} => {
+  const invoicesOfLastPeriod = filterByPeriod(invoices, "issuedAt", period, -1);
+  const invoicesOfThisPeriod = filterByPeriod(invoices, "issuedAt", period, 0);
   const bothZero =
-    invoicesOfThisMonth.length === 0 && invoicesOfLastMonth.length === 0;
+    invoicesOfThisPeriod.length === 0 && invoicesOfLastPeriod.length === 0;
 
   const calculatePercent = (current: number, previous: number) =>
     previous === 0
@@ -72,6 +125,14 @@ export const getAnalytics = (
         : 0
       : ((current - previous) / previous) * 100;
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("pl-PL", {
+      style: "currency",
+      currency: "PLN",
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
+
   switch (analyticType) {
     case "invoicesValue":
       const sumInvoices = (invoices: Invoice[]) =>
@@ -79,42 +140,151 @@ export const getAnalytics = (
           (total, invoice) => total + sumAllProducts(invoice.products),
           0
         );
-      const lastMonthSum = sumInvoices(invoicesOfLastMonth);
-      const thisMonthSum = sumInvoices(invoicesOfThisMonth);
+      const lastPeriodSum = sumInvoices(invoicesOfLastPeriod);
+      const thisPeriodSum = sumInvoices(invoicesOfThisPeriod);
+      const averageValue =
+        invoicesOfThisPeriod.length > 0
+          ? thisPeriodSum / invoicesOfThisPeriod.length
+          : 0;
 
       return {
-        value: `${(thisMonthSum / invoicesOfThisMonth.length || 0).toFixed(
-          2
-        )} PLN`,
-        percent: bothZero ? 0 : calculatePercent(thisMonthSum, lastMonthSum),
-        isHigher: thisMonthSum >= lastMonthSum,
+        value: formatCurrency(averageValue),
+        percent: bothZero ? 0 : calculatePercent(thisPeriodSum, lastPeriodSum),
+        isHigher: thisPeriodSum >= lastPeriodSum,
+        additionalInfo: `Łącznie: ${formatCurrency(thisPeriodSum)}`,
+      };
+
+    case "totalRevenue":
+      const sumInvoicesTotal = (invoices: Invoice[]) =>
+        invoices.reduce(
+          (total, invoice) => total + sumAllProducts(invoice.products),
+          0
+        );
+      const lastPeriodRevenue = sumInvoicesTotal(invoicesOfLastPeriod);
+      const thisPeriodRevenue = sumInvoicesTotal(invoicesOfThisPeriod);
+
+      return {
+        value: formatCurrency(thisPeriodRevenue),
+        percent: bothZero
+          ? 0
+          : calculatePercent(thisPeriodRevenue, lastPeriodRevenue),
+        isHigher: thisPeriodRevenue >= lastPeriodRevenue,
+        additionalInfo: `${invoicesOfThisPeriod.length} faktur`,
       };
 
     case "clients":
-      const clientsOfLastMonth = filterByMonth(clients, "createdAt", -1);
-      const clientsOfThisMonth = filterByMonth(clients, "createdAt", 0);
+      const clientsOfLastPeriod = filterByPeriod(
+        clients,
+        "createdAt",
+        period,
+        -1
+      );
+      const clientsOfThisPeriod = filterByPeriod(
+        clients,
+        "createdAt",
+        period,
+        0
+      );
 
       return {
-        value: clientsOfThisMonth.length.toString(),
+        value: clientsOfThisPeriod.length.toString(),
         percent: bothZero
           ? 0
           : calculatePercent(
-              clientsOfThisMonth.length,
-              clientsOfLastMonth.length
+              clientsOfThisPeriod.length,
+              clientsOfLastPeriod.length
             ),
-        isHigher: clientsOfThisMonth.length >= clientsOfLastMonth.length,
+        isHigher: clientsOfThisPeriod.length >= clientsOfLastPeriod.length,
+        additionalInfo: `Łącznie: ${clients.length} klientów`,
       };
 
     case "invoices":
       return {
-        value: invoicesOfThisMonth.length.toString(),
+        value: invoicesOfThisPeriod.length.toString(),
         percent: bothZero
           ? 0
           : calculatePercent(
-              invoicesOfThisMonth.length,
-              invoicesOfLastMonth.length
+              invoicesOfThisPeriod.length,
+              invoicesOfLastPeriod.length
             ),
-        isHigher: invoicesOfThisMonth.length >= invoicesOfLastMonth.length,
+        isHigher: invoicesOfThisPeriod.length >= invoicesOfLastPeriod.length,
+        additionalInfo: `Łącznie: ${invoices.length} faktur`,
+      };
+
+    case "paidInvoices":
+      const paidInvoicesThisPeriod = invoicesOfThisPeriod.filter(
+        (invoice) => invoice.status === "PAID"
+      );
+      const paidInvoicesLastPeriod = invoicesOfLastPeriod.filter(
+        (invoice) => invoice.status === "PAID"
+      );
+
+      return {
+        value: paidInvoicesThisPeriod.length.toString(),
+        percent: bothZero
+          ? 0
+          : calculatePercent(
+              paidInvoicesThisPeriod.length,
+              paidInvoicesLastPeriod.length
+            ),
+        isHigher:
+          paidInvoicesThisPeriod.length >= paidInvoicesLastPeriod.length,
+        additionalInfo: `${(
+          (paidInvoicesThisPeriod.length / invoicesOfThisPeriod.length) * 100 ||
+          0
+        ).toFixed(1)}% opłaconych`,
+      };
+
+    case "pendingInvoices":
+      const pendingInvoicesThisPeriod = invoicesOfThisPeriod.filter(
+        (invoice) => invoice.status === "PENDING"
+      );
+      const pendingInvoicesLastPeriod = invoicesOfLastPeriod.filter(
+        (invoice) => invoice.status === "PENDING"
+      );
+
+      return {
+        value: pendingInvoicesThisPeriod.length.toString(),
+        percent: bothZero
+          ? 0
+          : calculatePercent(
+              pendingInvoicesThisPeriod.length,
+              pendingInvoicesLastPeriod.length
+            ),
+        isHigher:
+          pendingInvoicesThisPeriod.length >= pendingInvoicesLastPeriod.length,
+        additionalInfo: `Wartość: ${formatCurrency(
+          pendingInvoicesThisPeriod.reduce(
+            (sum, invoice) => sum + sumAllProducts(invoice.products),
+            0
+          )
+        )}`,
+      };
+
+    case "unpaidInvoices":
+      const unpaidInvoicesThisPeriod = invoicesOfThisPeriod.filter(
+        (invoice) => invoice.status === "UNPAID"
+      );
+      const unpaidInvoicesLastPeriod = invoicesOfLastPeriod.filter(
+        (invoice) => invoice.status === "UNPAID"
+      );
+
+      return {
+        value: unpaidInvoicesThisPeriod.length.toString(),
+        percent: bothZero
+          ? 0
+          : calculatePercent(
+              unpaidInvoicesThisPeriod.length,
+              unpaidInvoicesLastPeriod.length
+            ),
+        isHigher:
+          unpaidInvoicesThisPeriod.length >= unpaidInvoicesLastPeriod.length,
+        additionalInfo: `Wartość: ${formatCurrency(
+          unpaidInvoicesThisPeriod.reduce(
+            (sum, invoice) => sum + sumAllProducts(invoice.products),
+            0
+          )
+        )}`,
       };
 
     default:

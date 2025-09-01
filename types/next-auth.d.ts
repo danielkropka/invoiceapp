@@ -1,4 +1,4 @@
-import { Address, Notification } from "@prisma/client";
+import { Address } from "@prisma/client";
 import type { User } from "next-auth";
 
 type userId = string;
@@ -8,7 +8,6 @@ declare module "next-auth/jwt" {
     id: userId;
     address: Address?;
     taxIdNumber: string?;
-    notifications: Notification[];
   }
 }
 
@@ -18,7 +17,6 @@ declare module "next-auth" {
       id: userId;
       address: Address?;
       taxIdNumber: string?;
-      notifications: Notification[];
     };
   }
 }

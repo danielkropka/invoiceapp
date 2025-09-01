@@ -15,8 +15,8 @@ export default function ConfirmInvoice({ token }: { token: string }) {
           token,
         });
 
-        toast.info(
-          "Potwierdzenie zostało przesłane do wystawcy faktury. Poinformujemy Cię drogą mailową, gdy opłacenie faktury zostanie zweryfikowane przez wystawcę."
+        toast.success(
+          "Faktura została oznaczona jako opłacona! Dziękujemy za płatność."
         );
       } catch {
         toast.error(

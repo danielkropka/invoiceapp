@@ -136,9 +136,8 @@ export default function EmailTemplate({
             lineHeight: "1.5",
           }}
         >
-          💡 <strong>Warto wiedzieć:</strong> Po potwierdzeniu płatności
-          otrzymasz powiadomienie, a status faktury zostanie automatycznie
-          zaktualizowany w naszym systemie.
+          💡 <strong>Warto wiedzieć:</strong> Po potwierdzeniu płatności status
+          faktury zostanie automatycznie zaktualizowany w naszym systemie.
         </p>
       </div>
 

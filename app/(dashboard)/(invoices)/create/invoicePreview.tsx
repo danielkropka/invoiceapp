@@ -46,14 +46,14 @@ export default function InvoicePreview({
   const { subtotal, totalVat, total } = calculateTotals();
 
   return (
-    <div className="bg-gradient-to-br from-muted/30 to-muted/60 backdrop-blur-sm rounded-2xl max-w-4xl p-6 lg:p-8 relative transition-all duration-500 ease-in-out border border-border/50 w-full">
+    <div className="bg-gradient-to-br from-muted/30 to-muted/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 relative transition-all duration-500 ease-in-out border border-border/50 w-full max-w-full overflow-x-hidden">
       {/* Header */}
       <div className="border-b border-border/30 pb-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Eye className="h-5 w-5 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
             Podgląd faktury
           </h1>
         </div>
@@ -78,7 +78,7 @@ export default function InvoicePreview({
             </div>
 
             {/* Invoice Details Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               {/* Issue Date */}
               <div className="bg-muted/30 rounded-lg p-4 border border-border/30 hover:border-primary/30 transition-colors duration-200">
                 <div className="flex items-center gap-3 mb-2">

@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { PlusCircle, FileText } from "lucide-react";
-import Analytics from "@/app/(dashboard)/(analytic)/analytics";
+
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import InvoicesCardContent from "./(invoices)/invoicesCardContent";
@@ -89,9 +89,6 @@ export default function Home({
           <InvoicesCardContent searchParams={searchParams} />
         </Suspense>
       </Card>
-
-      {/* Analytics Section */}
-      <Analytics />
     </div>
   );
 }

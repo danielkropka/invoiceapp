@@ -15,6 +15,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { User } from "next-auth";
 import { toast } from "sonner";
+import { Settings, LogOut, User as UserIcon } from "lucide-react";
 
 function UserMenu({ user }: { user: User }) {
   return (
@@ -23,27 +24,33 @@ function UserMenu({ user }: { user: User }) {
         <Button
           variant="outline"
           size="icon"
-          className="overflow-hidden rounded-full"
+          className="overflow-hidden rounded-full border-2 border-transparent hover:border-primary/20 transition-all duration-200 hover:scale-105 active:scale-95"
         >
           <Image
             src={user?.image ?? "/placeholder-user.jpg"}
-            width={36}
-            height={36}
+            width={32}
+            height={32}
             alt="avatar"
             unoptimized
-            className="overflow-hidden rounded-full"
+            className="overflow-hidden rounded-full object-cover"
           />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Moje konto</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel className="flex items-center gap-2">
+          <UserIcon className="h-4 w-4" />
+          Moje konto
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href={"/settings"}>Ustawienia</Link>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href={"/settings"} className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Ustawienia
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {user ? (
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
             <form
               action={() => {
                 signOut({
@@ -52,13 +59,20 @@ function UserMenu({ user }: { user: User }) {
                   toast.success("Pomyślnie wylogowano Cię.");
                 });
               }}
+              className="flex items-center gap-2 w-full"
             >
-              <button type="submit">Wyloguj się</button>
+              <LogOut className="h-4 w-4" />
+              <button type="submit" className="text-left">
+                Wyloguj się
+              </button>
             </form>
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem>
-            <Link href="/sign-in">Zaloguj się</Link>
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <Link href="/sign-in" className="flex items-center gap-2">
+              <UserIcon className="h-4 w-4" />
+              Zaloguj się
+            </Link>
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

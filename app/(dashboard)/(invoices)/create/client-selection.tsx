@@ -49,7 +49,7 @@ export default function ClientSelection({
                   variant="outline"
                   role="combobox"
                   className={cn(
-                    "w-full justify-between",
+                    "w-full justify-between h-12",
                     !field.value && "text-muted-foreground"
                   )}
                 >
@@ -64,7 +64,7 @@ export default function ClientSelection({
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
+            <PopoverContent className="w-[--radix-popover-trigger-width] max-w-[--radix-popover-trigger-width] p-0">
               <Command>
                 <CommandInput placeholder="Wyszukaj klienta..." />
                 <CommandList>
