@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
-import { PlusCircle, FileText, TrendingUp } from "lucide-react";
+import { PlusCircle, FileText } from "lucide-react";
 import Analytics from "@/app/(dashboard)/(analytic)/analytics";
 import Link from "next/link";
 import { cn } from "@/lib/utils";

@@ -12,11 +12,7 @@ export default async function ClientsCardContent({
   const offsetParam = searchParams.offset;
   const offset =
     offsetParam && !isNaN(Number(offsetParam)) ? Number(offsetParam) : 0;
-  const { clients, newOffset, totalClients } = await getClients(
-    search,
-    offset,
-    false
-  );
+  const { clients, totalClients } = await getClients(search, offset, false);
 
   return (
     <>
