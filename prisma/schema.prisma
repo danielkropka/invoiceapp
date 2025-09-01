@@ -24,6 +24,7 @@ type Address {
   street     String
   postalCode String
   city       String
+  country    String
 }
 
 type Product {

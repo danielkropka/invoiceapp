@@ -162,15 +162,6 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      // Debug logi
-      if (process.env.NODE_ENV === "production") {
-        console.log("JWT callback:", {
-          hasUser: !!user,
-          hasToken: !!token,
-          tokenEmail: token?.email,
-        });
-      }
-
       // Przy pierwszym logowaniu
       if (user) {
         token.id = user.id;
