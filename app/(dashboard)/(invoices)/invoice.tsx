@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ExternalLink, MoreHorizontal, Trash2, Eye } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Trash2 } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { InvoiceType } from "@/types/db";
 import moment from "moment";
