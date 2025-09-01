@@ -15,7 +15,8 @@ export async function PATCH(req: Request) {
     // Sprawdź czy to dane adresowe czy dane użytkownika
     if (body.street && body.postalCode && body.city) {
       // Aktualizacja danych adresowych
-      const { postalCode, city, nip, street } = addressFormSchema.parse(body);
+      const { postalCode, city, nip, street, country } =
+        addressFormSchema.parse(body);
 
       const user = await db.user.findFirst({
         where: {
@@ -35,6 +36,7 @@ export async function PATCH(req: Request) {
             postalCode,
             city,
             street,
+            country,
           },
           taxIdNumber: nip,
         },

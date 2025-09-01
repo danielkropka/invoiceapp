@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     if (!session?.user) return new Response("Unauthorized", { status: 401 });
 
     const body = await req.json();
+
     const { name, phoneNumber, taxIdNumber, address, email } =
       clientFormSchema.parse(body);
 
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
       data: {
         name,
         email,
-        address,
+        address: address,
         phoneNumber,
         taxIdNumber,
         creatorId: session.user.id,
@@ -39,13 +40,32 @@ export async function POST(req: Request) {
 
     return new Response("Client created", { status: 200 });
   } catch (error) {
+    console.error("Client creation error:", error);
+
     if (error instanceof z.ZodError) {
-      return new Response(error.message, { status: 422 });
+      console.error("Zod validation error:", error.errors);
+      return new Response(
+        JSON.stringify({
+          error: "Validation error",
+          details: error.errors,
+        }),
+        {
+          status: 422,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
-    return new Response("There was an error while creating client", {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({
+        error: "There was an error while creating client",
+        details: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
 

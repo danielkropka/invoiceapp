@@ -45,6 +45,7 @@ export default function AddressFormSettings({
       street: address?.street || "",
       city: address?.city || "",
       postalCode: address?.postalCode || "",
+      country: address?.country || "Polska",
       nip: "",
     },
   });
@@ -210,6 +211,32 @@ export default function AddressFormSettings({
                     <FormDescription>
                       Nazwa miasta lub miejscowości
                     </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      Kraj *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="np. Polska"
+                        {...field}
+                        className="h-11"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setHasChanges(true);
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>Nazwa kraju</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
