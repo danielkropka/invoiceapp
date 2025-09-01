@@ -32,29 +32,6 @@ export const sumAllProducts = (
   return sum;
 };
 
-function filterByMonth<
-  T extends { [K in DateKey]: Date },
-  DateKey extends keyof T
->(items: T[], dateKey: DateKey, monthOffset: number): T[] {
-  const currentDate = new Date();
-  const targetMonth = currentDate.getMonth() + monthOffset;
-  let targetYear = currentDate.getFullYear();
-
-  if (targetMonth < 0) {
-    targetYear -= 1;
-  }
-
-  const adjustedMonth = (targetMonth + 12) % 12;
-
-  return items.filter((item) => {
-    const itemDate = item[dateKey];
-    return (
-      itemDate.getMonth() === adjustedMonth &&
-      itemDate.getFullYear() === targetYear
-    );
-  });
-}
-
 // Funkcja pomocnicza do filtrowania danych według okresu
 function filterByPeriod<
   T extends { [K in DateKey]: Date },
@@ -103,7 +80,7 @@ function filterByPeriod<
 }
 
 export const getAnalytics = (
-  invoices: Invoice[],
+  invoices: (Omit<Invoice, "file"> & { client: Client })[],
   clients: Client[],
   analyticType: string,
   period: "month" | "quarter" | "year" = "month"
@@ -135,7 +112,9 @@ export const getAnalytics = (
 
   switch (analyticType) {
     case "invoicesValue":
-      const sumInvoices = (invoices: Invoice[]) =>
+      const sumInvoices = (
+        invoices: (Omit<Invoice, "file"> & { client: Client })[]
+      ) =>
         invoices.reduce(
           (total, invoice) => total + sumAllProducts(invoice.products),
           0
@@ -155,7 +134,9 @@ export const getAnalytics = (
       };
 
     case "totalRevenue":
-      const sumInvoicesTotal = (invoices: Invoice[]) =>
+      const sumInvoicesTotal = (
+        invoices: (Omit<Invoice, "file"> & { client: Client })[]
+      ) =>
         invoices.reduce(
           (total, invoice) => total + sumAllProducts(invoice.products),
           0

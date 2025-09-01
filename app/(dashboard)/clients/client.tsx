@@ -7,14 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  MoreHorizontal,
-  Trash2,
-  Mail,
-  MapPin,
-  Calendar,
-  User,
-} from "lucide-react";
+import { MoreHorizontal, Trash2, MapPin } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Client as ClientType } from "@prisma/client";
 import moment from "moment";

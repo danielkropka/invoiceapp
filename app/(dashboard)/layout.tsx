@@ -16,7 +16,6 @@ import User from "@/app/(dashboard)/user";
 import { SearchInput } from "@/app/(dashboard)/search";
 import DashboardBreadCrumb from "./breadcrumb";
 import { ModeToggle } from "./mode-toggle";
-import { cn } from "@/lib/utils";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 

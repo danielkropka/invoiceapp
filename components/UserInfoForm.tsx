@@ -31,7 +31,6 @@ import {
   User,
   Mail,
   Phone,
-  Hash,
   Save,
   CheckCircle,
   AlertCircle,
@@ -76,11 +75,6 @@ export default function UserInfoForm({
 
   // Monitorowanie zmian w formularzu
   const watchedValues = form.watch();
-  const hasFormChanges = Object.keys(watchedValues).some(
-    (key) =>
-      watchedValues[key as keyof UserInfoFormData] !==
-      (initialData[key as keyof typeof initialData] || "")
-  );
 
   const onSubmit = (data: UserInfoFormData) => {
     startTransition(async () => {

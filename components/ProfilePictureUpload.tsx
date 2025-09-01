@@ -11,7 +11,6 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  User,
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";

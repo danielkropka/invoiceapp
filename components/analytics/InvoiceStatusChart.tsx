@@ -12,6 +12,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  TooltipContentProps,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, PieChart as PieChartIcon } from "lucide-react";
@@ -154,7 +155,7 @@ export default function InvoiceStatusChart({
                 />
                 <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                 <Tooltip
-                  content={(props: any) => {
+                  content={(props: TooltipContentProps<number, string>) => {
                     const { active, payload, label } = props;
                     if (active && payload && payload.length) {
                       return (
@@ -223,7 +224,7 @@ export default function InvoiceStatusChart({
                   ))}
                 </Pie>
                 <Tooltip
-                  content={(props: any) => {
+                  content={(props: TooltipContentProps<number, string>) => {
                     const { active, payload } = props;
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;

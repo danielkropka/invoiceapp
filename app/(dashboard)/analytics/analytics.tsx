@@ -17,10 +17,11 @@ import {
   Clock,
   XCircle,
 } from "lucide-react";
+import { Client, Invoice } from "@prisma/client";
 
 interface AnalyticsProps {
-  invoices: any[];
-  clients: any[];
+  invoices: (Omit<Invoice, "file"> & { client: Client })[];
+  clients: Client[];
 }
 
 function Analytics({ invoices, clients }: AnalyticsProps) {

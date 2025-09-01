@@ -31,7 +31,6 @@ import {
   PlusCircle,
   Receipt,
   User,
-  Package,
   Settings,
 } from "lucide-react";
 import Products from "./products";
